@@ -56,8 +56,26 @@ def generate_algorithm():
 @app.route("/single", methods=["POST"])
 def single():
     request_data = request.get_json()
+    gen_type = request_data.get("type")
 
-    return {"content": strip_backticks(gen_docstring(request_data.get("content")))}
+    if (not gen_type) or (gen_type not in ["code", "algo", "guide", "diagram"]):
+        raise ValueError("Invalid type")
+
+    result = ""
+
+    match gen_type:
+        case "code":
+            result = gen_docstring(request_data.get("content"))
+        case "algo":
+            result = gen_algorithm(request_data.get("content"))
+        case "guide":
+            result = gen_algorithm(request_data.get("content"))
+        case "diagram":
+            result = "Not implemented yet"
+        case _:
+            raise ValueError("Invalid type")
+
+    return {"content": strip_backticks(result), "type": gen_type}
 
 
 if __name__ == "__main__":
