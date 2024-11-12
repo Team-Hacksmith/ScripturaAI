@@ -1,4 +1,5 @@
 import os
+from ai import gen_docstring
 from flask import Flask, request
 from fileIO import write_to_file
 
@@ -10,6 +11,9 @@ PUBLIC_DIR = "uploads"
 # Ensure the public directory exists
 os.makedirs(PUBLIC_DIR, exist_ok=True)
 
+@app.route("/", methods=["GET"])
+def home():
+    return "Hello World"
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
