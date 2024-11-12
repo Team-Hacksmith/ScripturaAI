@@ -41,5 +41,12 @@ def upload_file():
     return {"files": output_file_records}, 200
 
 
+@app.route("/single", methods=["POST"])
+def single():
+    request_data = request.get_json()
+
+    return {"content": gen_docstring(request_data.get("content"))}
+
+
 if __name__ == "__main__":
     app.run(debug=True)
