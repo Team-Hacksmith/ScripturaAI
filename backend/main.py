@@ -1,14 +1,19 @@
 import os
 from ai import gen_docstring
 from flask import Flask, request
+from fileIO import write_to_file
 
 app = Flask(__name__)
 
+# Define the public directory to save files
+PUBLIC_DIR = "uploads"
+
+# Ensure the public directory exists
+os.makedirs(PUBLIC_DIR, exist_ok=True)
 
 @app.route("/", methods=["GET"])
 def home():
     return "Hello World"
-
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
@@ -19,15 +24,35 @@ def upload_file():
     # Get the list of files
     files = request.files.getlist("file")
 
-    # Print each file's name and content
-    for file in files:
-        print(f"Filename: {file.filename}")
-        print("Content:")
-        print(
-            file.read().decode("utf-8")
-        )  # Assuming the file is a text file; adjust for other file types
+    # Initialize a list to store file details
+    file_records = []
 
-    return "Files received and printed successfully", 200
+    # Process each file
+    for file in files:
+        # Extract the filename and file extension
+        if not file.filename:
+            print("Warning: No file name, skipping file...")
+            continue
+
+        filename: str = file.filename
+        file_ext = filename.rsplit(".", 1)[-1] if "." in filename else ""
+
+        # Read file content and decode it (assuming it's a text file)
+        content = file.read().decode(
+            "utf-8"
+        )  # Adjust decoding if dealing with non-text files
+
+        # Create a dictionary for the current file
+        file_info = {"filename": filename, "fileExt": file_ext, "content": content}
+
+        # Add the file info dictionary to the list
+        file_records.append(file_info)
+
+    # Call the function to save the files in the public folder
+    write_to_file(file_records)
+
+    # Return the list of file records as a JSON response
+    return {"files": file_records}, 200
 
 
 if __name__ == "__main__":
