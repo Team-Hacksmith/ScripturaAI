@@ -1,14 +1,18 @@
 import os
 from ai import gen_docstring, gen_algorithm
 from flask import Flask, request, jsonify
+
 from fileIO import read_files, write_files
 from github_routes import clone_repo
+
 app = Flask(__name__)
 
 
 @app.route("/", methods=["GET"])
 def home():
     return "Hello World"
+
+PUBLIC_DIR = "uploads"
 
 
 @app.route("/upload", methods=["POST"])

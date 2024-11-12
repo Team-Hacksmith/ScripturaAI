@@ -1,4 +1,3 @@
-# file_utils.py
 import os
 
 from flask import Request
@@ -27,6 +26,9 @@ def write_files(file_records, remove_backticks=True):
         # Extract the filename and content from the file data
         filename = file_data.get("filename")
         content = file_data.get("content")
+
+        if(remove_backticks):
+            content = strip_backticks(content)
 
         if not filename or not content:
             raise ValueError("Filename or content missing")
@@ -107,8 +109,6 @@ def read_folder(z, folder_path):
                 folder_records.append(
                     {"filename": filename, "fileExt": file_ext, "content": content}
                 )
-
-    return folder_records
 
     return folder_records
 

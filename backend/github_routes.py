@@ -11,7 +11,6 @@ GITHUB_API_URL = "https://api.github.com"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 CLONE_DIR = "cloned_repos"
 
-# CLONE_DIR = "cloned_repos"
 
 
 def zip_repo(repo_name):
