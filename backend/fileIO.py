@@ -1,12 +1,8 @@
 import os
-
 from flask import Request
-
 from zipfile import ZipFile
 from typing import List, Any
 
-PUBLIC_DIR = "uploads"
-os.makedirs(PUBLIC_DIR, exist_ok=True)
 PUBLIC_DIR = "uploads"
 os.makedirs(PUBLIC_DIR, exist_ok=True)
 
@@ -23,24 +19,20 @@ def strip_backticks(code):
 
 def write_files(file_records, remove_backticks=True):
     for file_data in file_records:
-        # Extract the filename and content from the file data
         filename = file_data.get("filename")
         content = file_data.get("content")
 
-        if(remove_backticks):
+        if remove_backticks:
             content = strip_backticks(content)
 
         if not filename or not content:
             raise ValueError("Filename or content missing")
 
-        # Define the full path for the file in the public directory
         file_path = os.path.join(PUBLIC_DIR, filename)
 
         try:
-            # Ensure subdirectories in filename path are created
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-            # Write content to the file in the public directory
             with open(file_path, "w") as file:
                 file.write(content)
 
@@ -111,7 +103,6 @@ def read_folder(z, folder_path):
                 )
 
     return folder_records
-
 
 
 def read_zip(zip_file):
