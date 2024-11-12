@@ -1,7 +1,10 @@
 import os
 
 from flask import Request
-from zipfile import ZipFile
+from zipfile import ZipFile, ZIP_DEFLATED
+import io
+
+from util import id_generator
 
 PUBLIC_DIR = "uploads"
 os.makedirs(PUBLIC_DIR, exist_ok=True)
@@ -18,6 +21,28 @@ def strip_backticks(code):
 
         code = code.rstrip("`")
     return code
+
+
+def write_files_to_memory(file_records, remove_backticks=True):
+    # Create an in-memory zip file
+    zip_buffer = io.BytesIO()
+    with ZipFile(zip_buffer, "w", ZIP_DEFLATED) as zip_file:
+        for file_data in file_records:
+            filename = file_data.get("filename")
+            content = file_data.get("content")
+
+            if remove_backticks:
+                content = strip_backticks(content)
+
+            if not filename or not content:
+                raise ValueError("Filename or content missing")
+
+            # Add file to the zip file in memory
+            zip_file.writestr(filename, content)
+
+    # Make sure to seek back to the start of the BytesIO object
+    zip_buffer.seek(0)
+    return zip_buffer
 
 
 def write_files(file_records, remove_backticks=True):

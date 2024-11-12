@@ -1,6 +1,6 @@
 import os
-from fileIO import read_files, strip_backticks, write_files
-from flask import Flask, request, jsonify
+from fileIO import read_files, strip_backticks, write_files_to_memory
+from flask import Flask, request, jsonify, send_file
 from ai import gen_docstring, gen_algorithm, gen_mermaid, gen_guide
 from github_routes import clone_repo
 
@@ -38,9 +38,16 @@ def upload_file():
             }
         )
 
-    write_files(output_file_records)
+    # Get the in-memory zip file containing all files
+    zip_buffer = write_files_to_memory(output_file_records)
 
-    return {"files": output_file_records}, 200
+    # Send the zip file as a downloadable response
+    return send_file(
+        zip_buffer,
+        mimetype="application/zip",
+        as_attachment=True,
+        download_name="files.zip",
+    )
 
 
 @app.route("/single", methods=["POST"])
