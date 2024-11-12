@@ -4,7 +4,7 @@ import os
 import subprocess
 from dotenv import load_dotenv
 import shutil
-
+from fileIO import generate_docstring_for_whole_repo, write_files
 load_dotenv()
 
 GITHUB_API_URL = "https://api.github.com"
@@ -39,31 +39,6 @@ def delete_repo(repo_name):
 
 
 
-
-# def process_repo_files(repo_path):
-#     """Processes all the files and folders in the cloned repository."""
-#     # Walk through all the files and folders in the cloned repo
-#     for root, dirs, files in os.walk(repo_path):
-#         for file in files:
-#             file_path = os.path.join(root, file)
-#             # Here, you can process the file, e.g., read, analyze, generate documentation, etc.
-#             print(f"Processing file: {file_path}")
-#             with open(file_path, "r", encoding="utf-8") as f:
-#                 file_content = f.read()
-#                 # Perform any processing on the file content here
-#                 print(file_content)  # Example: printing the file content
-
-#             # You can call other functions to generate documentation or code comments here
-#             # For example, if you want to generate documentation for each file, you can:
-#             generate_file_documentation(file, file_content)
-
-
-# def generate_file_documentation(file_name, file_content):
-#     """Generates documentation or comments for a specific file."""
-#     print(f"Generating documentation for {file_name}")
-#     print(file_name)
-
-
 def clone_repo(repo_url):
     if not repo_url:
         return jsonify({"error": "Missing 'repo_url' parameter"}), 400
@@ -80,11 +55,13 @@ def clone_repo(repo_url):
     except subprocess.CalledProcessError as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": f"Failed to clone the repository: {str(e)}"}), 500
-    zip_repo(repo_name)
-    delete_repo(repo_name)
+    zip_file_path = zip_repo(repo_name)
+    generate_docstring_for_whole_repo(CLONE_DIR + "/" + repo_name)
+    
     return jsonify(
         {
             "message": f"Repository '{repo_name}' cloned successfully. And zipped successfully",
             "repo": repo_name,
+            "repo_url": repo_url
         }
     )

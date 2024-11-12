@@ -1,7 +1,7 @@
 "use server";
 
 import { OutputType } from "@/components/single-code/types";
-import { getSingleGeneration } from "./api";
+import { getMultipleGeneration, getSingleGeneration } from "./api";
 import { GetSingleGenerationResponse } from "./types";
 
 export const getSingleGenerationAction = async (
@@ -9,5 +9,13 @@ export const getSingleGenerationAction = async (
   type: OutputType
 ): Promise<GetSingleGenerationResponse> => {
   const data = await getSingleGeneration(code, type);
+  return data;
+};
+
+export const getMultipleGenerationAction = async (
+  files: File[],
+  type: OutputType
+): Promise<Blob> => {
+  const data = await getMultipleGeneration(files, type);
   return data;
 };

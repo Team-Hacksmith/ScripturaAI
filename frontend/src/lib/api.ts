@@ -16,3 +16,20 @@ export const getSingleGeneration = async (
   const data = await response.json();
   return data;
 };
+
+export const getMultipleGeneration = async (
+  files: File[],
+  type: OutputType
+): Promise<Blob> => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append("file", file);
+  });
+  formData.append("type", type);
+  const response = await fetch(`${BASE_URL}/upload`, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await response.blob();
+  return data;
+};
