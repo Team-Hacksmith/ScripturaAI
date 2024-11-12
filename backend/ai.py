@@ -11,9 +11,9 @@ import os
 from pydantic import SecretStr
 
 
-def gen_docstring(content):
+def gen_docstring(content) -> str:
     prompt = ChatPromptTemplate.from_template(
-        "Please add doc strings to this code {content}. Only output the code and nothing else."
+        "Please add doc strings to this code {content}. Your responses should only be code, without explanation or formatting"
     )
 
     key = SecretStr(os.getenv("GEMINI_API_KEY", ""))
@@ -31,4 +31,4 @@ def gen_docstring(content):
     chain = prompt | model | output_parser
 
     response = chain.invoke({"content": content})
-    print(response)
+    return response

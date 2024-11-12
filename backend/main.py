@@ -23,6 +23,7 @@ def upload_file():
     files = request.files.getlist("file")
 
     file_records = []
+    output_file_records = []
 
     for file in files:
         if not file.filename:
@@ -35,12 +36,18 @@ def upload_file():
         content = file.read().decode("utf-8")
 
         file_info = {"filename": filename, "fileExt": file_ext, "content": content}
+        op_file_info = {
+            "filename": filename,
+            "fileExt": file_ext,
+            "content": gen_docstring(content),
+        }
 
         file_records.append(file_info)
+        output_file_records.append(op_file_info)
 
-    write_to_file(file_records)
+    write_to_file(output_file_records)
 
-    return {"files": file_records}, 200
+    return {"files": output_file_records}, 200
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 import os
 
-PUBLIC_DIR = "public"
+PUBLIC_DIR = "uploads"
 
 os.makedirs(PUBLIC_DIR, exist_ok=True)
 
