@@ -21,12 +21,13 @@ def strip_backticks(code):
     return code
 
 
-def write_files(file_records):
+def write_files(file_records, remove_backticks=True):
     for file_data in file_records:
         filename = file_data.get("filename")
         content = file_data.get("content")
 
-        content = strip_backticks(content)
+        if(remove_backticks):
+            content = strip_backticks(content)
 
         if not filename or not content:
             raise ValueError("Filename or content missing")
@@ -106,6 +107,9 @@ def read_folder(z, folder_path):
                 )
 
     return folder_records
+
+    return folder_records
+
 
 
 def read_zip(zip_file):
