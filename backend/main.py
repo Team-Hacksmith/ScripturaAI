@@ -2,6 +2,8 @@ import os
 from ai import gen_docstring, gen_algorithm, gen_mermaid, gen_guide
 from flask import Flask, request, jsonify
 from fileIO import read_files, write_files
+from github_routes import clone_repo
+
 
 app = Flask(__name__)
 
@@ -44,35 +46,35 @@ def upload_file():
 @app.route("/genalgo", methods=["POST"])
 def generate_algorithm():
     data = request.get_json()
-    if(data and "text" in data):
+    if data and "text" in data:
         text = data["text"]
         gen_algorithm(text)
         return jsonify({"content": text}), 200
-    
     else:
         return jsonify({"error": "No text data provided"}), 400
-    
+
+
 @app.route("/genMermaid", methods=["POST"])
 def generate_mermaid():
     data = request.get_json()
-    if(data and "text" in data):
+    if data and "text" in data:
         text = data["text"]
         res = gen_mermaid(text)
         # write_files(res)
         return jsonify({"content": res}), 200
-    
+
     else:
         return jsonify({"error": "No text data provided"}), 400
-    
+
+
 @app.route("/genGuide", methods=["POST"])
 def generate_guide():
     data = request.get_json()
-    if(data and "text" in data):
+    if data and "text" in data:
         text = data["text"]
         gen_guide(text)
         # write_files({"filename": "userGuide.md", "content": res}, False)
         return jsonify({"content": text}), 200
-    
     else:
         return jsonify({"error": "No text data provided"}), 400
 
@@ -81,6 +83,17 @@ def single():
     request_data = request.get_json()
 
     return {"content": gen_docstring(request_data.get("content"))}
+
+
+@app.route("/cloneRepo", methods=["POST"])
+def cloneRepo():
+    repo_url = request.json.get("repo_url")
+
+    if not repo_url:
+        return jsonify({"error": "Missing repo_url parameter"}), 400
+
+    # Call the clone_repo function to clone the repo
+    return clone_repo(repo_url)
 
 
 if __name__ == "__main__":
