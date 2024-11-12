@@ -5,10 +5,6 @@ from fileIO import read_files, write_files
 from github_routes import clone_repo
 app = Flask(__name__)
 
-PUBLIC_DIR = "uploads"
-
-os.makedirs(PUBLIC_DIR, exist_ok=True)
-
 
 @app.route("/", methods=["GET"])
 def home():
