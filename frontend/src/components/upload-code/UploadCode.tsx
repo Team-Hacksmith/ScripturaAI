@@ -5,9 +5,19 @@ import { useState } from "react";
 import Dropzone from "react-dropzone";
 import { Button } from "../ui/button";
 import { getMultipleGenerationAction } from "@/lib/actions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { supported_types } from "@/lib/config";
+import { OutputType } from "../single-code/types";
 
 const UploadCode = () => {
   const [files, setFiles] = useState<File[]>([]);
+  const [type, setType] = useState<OutputType>("code");
   const [isPending, setIsPending] = useState(false);
 
   const addFiles = (newFiles: File[]) => {
@@ -32,7 +42,7 @@ const UploadCode = () => {
             <section className="flex-1 text-center">
               <div
                 className={cn(
-                  "p-32 border border-dashed rounded-md flex flex-col gap-10 items-center justify-center",
+                  "p-32 py-64 border border-dashed rounded-md flex flex-col gap-10 items-center justify-center",
                   { "border-foreground": isDragActive }
                 )}
                 {...getRootProps()}
@@ -65,30 +75,50 @@ const UploadCode = () => {
           ))}
         </div>
       </div>
-      <Button
-        onClick={async () => {
-          setIsPending(true);
-          const blob = await getMultipleGenerationAction(files, "code");
+      <div className="flex flex-col gap-3">
+        <Select
+          value={type}
+          onValueChange={(val) => setType(val as OutputType)}
+        >
+          <SelectTrigger className="capitalize w-full">
+            <SelectValue placeholder="Type" />
+          </SelectTrigger>
+          <SelectContent>
+            {supported_types.map((type) => (
+              <SelectItem className="capitalize" key={type} value={type}>
+                {type}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          const url = window.URL.createObjectURL(blob);
+        <Button
+          onClick={async () => {
+            setIsPending(true);
+            const blob = await getMultipleGenerationAction(files, type);
 
-          const link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", "files.zip");
-          document.body.appendChild(link);
-          link.click();
+            const url = window.URL.createObjectURL(blob);
 
-          link.remove();
-          window.URL.revokeObjectURL(url);
-          setIsPending(false);
-        }}
-        variant={"outline"}
-        size={"lg"}
-        isPending={isPending}
-      >
-        Generate docstrings
-        {!isPending && <ArrowDown />}
-      </Button>
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "files.zip");
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            setIsPending(false);
+          }}
+          variant={"outline"}
+          isPending={isPending}
+        >
+          {isPending
+            ? "Generating docs... This will take a while."
+            : "Generate docs"}
+
+          {!isPending && <ArrowDown />}
+        </Button>
+      </div>
     </div>
   );
 };
