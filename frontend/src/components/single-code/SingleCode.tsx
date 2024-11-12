@@ -15,26 +15,7 @@ import { Label } from "../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import SingleCodeOutput from "./SingleCodeOutput";
 import { OutputType, SingleCodeOutput as SingleCodeOutputT } from "./types";
-
-export const supported_languages = [
-  "python",
-  "cpp",
-  "c",
-  "java",
-  "javascript",
-  "typescript",
-  "rust",
-  "go",
-  "kotlin",
-  "swift",
-];
-
-export const supported_types: OutputType[] = [
-  "code",
-  "algo",
-  "guide",
-  "diagram",
-];
+import { supported_languages, supported_types } from "@/lib/config";
 
 const SingleCode = () => {
   const [value, setValue] = useState("");

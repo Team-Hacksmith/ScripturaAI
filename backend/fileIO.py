@@ -1,10 +1,8 @@
 import os
 
 from flask import Request
-from zipfile import ZipFile
-from zipfile import ZIP_DEFLATED
-from io import BytesIO
-from ai import gen_docstring
+from zipfile import ZipFile, ZIP_DEFLATED
+import io
 
 PUBLIC_DIR = "uploads"
 os.makedirs(PUBLIC_DIR, exist_ok=True)
@@ -21,6 +19,28 @@ def strip_backticks(code):
 
         code = code.rstrip("`")
     return code
+
+
+def write_files_to_memory(file_records, remove_backticks=True):
+    # Create an in-memory zip file
+    zip_buffer = io.BytesIO()
+    with ZipFile(zip_buffer, "w", ZIP_DEFLATED) as zip_file:
+        for file_data in file_records:
+            filename = file_data.get("filename")
+            content = file_data.get("content")
+
+            if remove_backticks:
+                content = strip_backticks(content)
+
+            if not filename or not content:
+                raise ValueError("Filename or content missing")
+
+            # Add file to the zip file in memory
+            zip_file.writestr(filename, content)
+
+    # Make sure to seek back to the start of the BytesIO object
+    zip_buffer.seek(0)
+    return zip_buffer
 
 
 def write_files(file_records, remove_backticks=True):
@@ -85,7 +105,6 @@ def read_files(request: Request):
     return file_records
 
 
-
 def read_folder(z, folder_path):
     """Reads all files inside a folder in a ZIP archive."""
     folder_records = []
@@ -110,6 +129,7 @@ def read_folder(z, folder_path):
                 )
 
     return folder_records
+
 
 def read_zip(zip_file):
     file_records = []
@@ -140,13 +160,24 @@ def read_zip(zip_file):
     return file_records
 
 
+BLACKLISTED_EXTENSIONS = {
+    ".exe",
+    ".bin",
+    ".dll",
+    ".so",
+    ".pyc",
+    ".class",
+    ".pack",
+    ".idx",
+}
+BLACKLISTED_PATHS = {".git"}
 
-BLACKLISTED_EXTENSIONS = {".exe", ".bin", ".dll", ".so", ".pyc", ".class", ".pack", ".idx"}
-BLACKLISTED_PATHS = {".git"}  
 
 def create_file_record(file_path):
+    from ai import gen_docstring
+
     """Creates a dictionary with file information for a given file path, skipping blacklisted files and directories."""
-    
+
     # Skip files in blacklisted directories or with blacklisted extensions
     if any(blacklist in file_path for blacklist in BLACKLISTED_PATHS):
         print(f"Skipping file in blacklisted directory: {file_path}")
@@ -174,7 +205,6 @@ def create_file_record(file_path):
         # Catch any other errors (such as permission errors, etc.)
         print(f"Error reading file {file_path}: {e}")
         return None
-
 
 
 def generate_docstring_for_whole_repo(repo_folder_path):
