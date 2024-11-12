@@ -1,44 +1,8 @@
-"use client";
-
-import CodeEditor from "@/components/ui/CodeEditor";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SingleCode from "@/components/single-code/SingleCode";
 
 const Page: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [code, setCode] = useState<string>(""); // State to manage the code in the editor
-  const [language, setLanguage] = useState<string>(""); // State to track the selected language
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
-  };
-
-  const handleSubmit = () => {
-    if (file) {
-      setLoading(true);
-      // Simulate file upload with a timeout (replace with actual upload logic)
-      setTimeout(() => {
-        console.log("File uploaded:", file);
-        setLoading(false); // Stop the spinner after upload
-      }, 3000); // Simulate 3 seconds of upload time
-    } else {
-      alert("Please select a file before uploading.");
-    }
-  };
-
-  const handleCodeChange = (newCode: string) => {
-    setCode(newCode); // Update the state with the new code from the editor
-  };
-
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value); // Update the language based on user selection
-  };
-
   return (
     <div className="container mx-auto p-10 h-screen justify-stretch">
       <Card className="p-5">

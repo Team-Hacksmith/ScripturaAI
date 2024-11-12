@@ -1,4 +1,4 @@
-export type OutputType = "markdown" | "mermaid" | "code";
+export type OutputType = "guide" | "algo" | "diagram" | "code";
 
 export type SingleCodeOutput = {
   type: OutputType;

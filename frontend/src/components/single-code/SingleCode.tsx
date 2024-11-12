@@ -29,7 +29,12 @@ export const supported_languages = [
   "swift",
 ];
 
-export const supported_types = ["code", "markdown", "mermaid"];
+export const supported_types: OutputType[] = [
+  "code",
+  "algo",
+  "guide",
+  "diagram",
+];
 
 const SingleCode = () => {
   const [value, setValue] = useState("");
@@ -66,7 +71,7 @@ const SingleCode = () => {
         </Select>
       </fieldset>
 
-      <div className="flex flex-col xl:flex-row gap-5 xl:items-center">
+      <div className="flex flex-col xl:flex-row gap-5">
         <div className="xl:flex-1">
           <CodeEditor
             language={lang}
@@ -77,7 +82,7 @@ const SingleCode = () => {
           />
         </div>
 
-        <div className="flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col gap-2 items-center py-10">
           <Select
             value={type}
             onValueChange={(val) => setType(val as OutputType)}
@@ -96,8 +101,8 @@ const SingleCode = () => {
           <Button
             onClick={async () => {
               setIsPending(true);
-              const data = await getSingleGenerationAction(value);
-              createOutput({ type: "code", content: data.content });
+              const data = await getSingleGenerationAction(value, type);
+              createOutput({ type: data.type, content: data.content });
               setIsPending(false);
             }}
             className=""
