@@ -4,7 +4,6 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain_google_genai import ChatGoogleGenerativeAI
-from fileIO import write_files
 
 import os
 
@@ -29,12 +28,14 @@ def gen_docstring(content) -> str:
     output_parser = StrOutputParser()
 
     chain = prompt | model | output_parser
-
     response = chain.invoke({"content": content})
+    print(response)
     return response
 
 
 def gen_algorithm(content) -> str:
+    from fileIO import write_files
+
     prompt = ChatPromptTemplate.from_template(
         "You are a advanced and professional programmer with in depth knowledge in all the programming languages. {content} Please write me algorithm for this code, explaining all the steps of how this code works. And if there is more than more function or classes explain them all differently. Also give the output in the markdown format."
     )
@@ -105,6 +106,8 @@ def gen_mermaid(text) -> str:
     return response
 
 def gen_guide(content) -> str:
+    from fileIO import write_files
+
     prompt = ChatPromptTemplate.from_template(
         "Please analyse this code: {content}. Find patterns and return a markdown response for this explaining this code like a documentation you can refer popular documentation pages and then try to explain the code using markdown."
     )
@@ -123,3 +126,4 @@ def gen_guide(content) -> str:
     response = chain.invoke({"content": content})
     write_files([{"filename": "userGuide.md", "content": response}], False)
     return response
+
