@@ -43,42 +43,6 @@ def upload_file():
     return {"files": output_file_records}, 200
 
 
-@app.route("/genalgo", methods=["POST"])
-def generate_algorithm():
-    data = request.get_json()
-    if data and "text" in data:
-        text = data["text"]
-        gen_algorithm(text)
-        return jsonify({"content": text}), 200
-    else:
-        return jsonify({"error": "No text data provided"}), 400
-
-
-@app.route("/genMermaid", methods=["POST"])
-def generate_mermaid():
-    data = request.get_json()
-    if data and "text" in data:
-        text = data["text"]
-        res = gen_mermaid(text)
-        # write_files(res)
-        return jsonify({"content": res}), 200
-
-    else:
-        return jsonify({"error": "No text data provided"}), 400
-
-
-@app.route("/genGuide", methods=["POST"])
-def generate_guide():
-    data = request.get_json()
-    if data and "text" in data:
-        text = data["text"]
-        gen_guide(text)
-        # write_files({"filename": "userGuide.md", "content": res}, False)
-        return jsonify({"content": text}), 200
-    else:
-        return jsonify({"error": "No text data provided"}), 400
-
-
 @app.route("/single", methods=["POST"])
 def single():
     request_data = request.get_json()
