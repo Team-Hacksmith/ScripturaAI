@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import CodeEditor from "./ui/CodeEditor";
 import {
@@ -9,6 +10,8 @@ import {
 } from "@/components/ui/select";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
+import { getSingleGenerationAction } from "@/lib/actions";
+import { ArrowRight } from "lucide-react";
 
 export const supported_languages = [
   "python",
@@ -25,6 +28,8 @@ export const supported_languages = [
 
 const SingleCode = () => {
   const [value, setValue] = useState("");
+  const [output, setOutput] = useState("");
+  const [isPending, setIsPending] = useState(false);
   const [lang, setLang] = useState(supported_languages[0]);
 
   return (
@@ -50,17 +55,35 @@ const SingleCode = () => {
         </Select>
       </fieldset>
 
-      <CodeEditor
-        language={lang}
-        onChange={(val) => {
-          setValue(val);
-        }}
-        value={value}
-      />
+      <div className="flex flex-col xl:flex-row gap-5 xl:items-center">
+        <div className="xl:flex-1">
+          <CodeEditor
+            language={lang}
+            onChange={(val) => {
+              setValue(val);
+            }}
+            value={value}
+          />
+        </div>
 
-      <Button className="ml-auto" size={"lg"}>
-        Submit
-      </Button>
+        <Button
+          onClick={async () => {
+            setIsPending(true);
+            const data = await getSingleGenerationAction(value);
+            setOutput(data.content);
+            setIsPending(false);
+          }}
+          className="ml-auto"
+          variant={"outline"}
+          size={"icon"}
+          isPending={isPending}
+        >
+          <ArrowRight />
+        </Button>
+        <div className="xl:flex-1">
+          <CodeEditor language={lang} onChange={() => {}} value={output} />
+        </div>
+      </div>
     </div>
   );
 };

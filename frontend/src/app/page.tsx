@@ -40,7 +40,7 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-10 grid grid-cols-1 lg:grid-cols-2 gap-5 h-screen justify-stretch">
+    <div className="container mx-auto p-10 h-screen justify-stretch">
       <Card className="p-5">
         <Tabs defaultValue="code" className="h-full">
           <TabsList className="mb-3">
@@ -52,16 +52,6 @@ const Page: React.FC = () => {
           </TabsContent>
           <TabsContent value="upload">Change your password here.</TabsContent>
         </Tabs>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Editor</CardTitle>
-        </CardHeader>
-        <CardContent>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Reiciendis
-          sequi est nam suscipit voluptatum, ab consequuntur dolor blanditiis.
-          Dignissimos, dolore.
-        </CardContent>
       </Card>
     </div>
     // <div className="max-w-md mx-auto bg-background p-6 rounded-md shadow-md">
