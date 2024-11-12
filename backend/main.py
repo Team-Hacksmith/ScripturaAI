@@ -1,4 +1,5 @@
 import os
+from ai import gen_docstring
 from flask import Flask, request
 
 app = Flask(__name__)
@@ -6,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def home():
-    return "Hello world"
+    return "Hello World"
 
 
 @app.route("/upload", methods=["POST"])
