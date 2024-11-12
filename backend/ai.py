@@ -18,7 +18,7 @@ def gen_docstring(content) -> str:
 
     key = SecretStr(os.getenv("GEMINI_API_KEY", ""))
 
-    if not key:
+    if key == "":
         raise Exception("Gemini API Key not set")
 
     model = ChatGoogleGenerativeAI(

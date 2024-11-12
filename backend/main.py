@@ -1,7 +1,7 @@
 import os
 from ai import gen_docstring
 from flask import Flask, request
-from fileIO import write_to_file
+from fileIO import read_files, write_files
 
 app = Flask(__name__)
 
@@ -17,35 +17,26 @@ def home():
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    if "file" not in request.files:
-        return "No file part in the request", 400
-
-    files = request.files.getlist("file")
-
-    file_records = []
+    file_records = read_files(request)
     output_file_records = []
 
-    for file in files:
-        if not file.filename:
-            print("Warning: No file name, skipping file...")
-            continue
+    for file_data in file_records:
+        filename = file_data.get("filename", None)
+        content = file_data.get("content", None)
+        fileExt = file_data.get("fileExt", None)
 
-        filename: str = file.filename
-        file_ext = filename.rsplit(".", 1)[-1] if "." in filename else ""
+        if not filename or not content or not fileExt:
+            raise ValueError("Invalid data")
 
-        content = file.read().decode("utf-8")
+        output_file_records.append(
+            {
+                "filename": filename,
+                "fileExt": fileExt,
+                "content": gen_docstring(content),
+            }
+        )
 
-        file_info = {"filename": filename, "fileExt": file_ext, "content": content}
-        op_file_info = {
-            "filename": filename,
-            "fileExt": file_ext,
-            "content": gen_docstring(content),
-        }
-
-        file_records.append(file_info)
-        output_file_records.append(op_file_info)
-
-    write_to_file(output_file_records)
+    write_files(output_file_records)
 
     return {"files": output_file_records}, 200
 
