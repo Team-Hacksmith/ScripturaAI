@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Mermaid from '@/components/Mermaid'
 
 const AddDoc: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
