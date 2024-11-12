@@ -4,7 +4,7 @@ import CodeEditor from "@/components/ui/CodeEditor";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SingleCode from "@/components/single-code";
+import SingleCode from "@/components/single-code/SingleCode";
 
 const Page: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);

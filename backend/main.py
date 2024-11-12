@@ -1,7 +1,7 @@
 import os
 from ai import gen_docstring
 from flask import Flask, request
-from fileIO import read_files, write_files
+from fileIO import read_files, strip_backticks, write_files
 
 app = Flask(__name__)
 
@@ -45,7 +45,7 @@ def upload_file():
 def single():
     request_data = request.get_json()
 
-    return {"content": gen_docstring(request_data.get("content"))}
+    return {"content": strip_backticks(gen_docstring(request_data.get("content")))}
 
 
 if __name__ == "__main__":
