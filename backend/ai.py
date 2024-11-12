@@ -5,6 +5,7 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain_openai import ChatOpenAI
 from fileIO import write_files
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 import os
 
@@ -29,12 +30,14 @@ def gen_docstring(content) -> str:
     output_parser = StrOutputParser()
 
     chain = prompt | model | output_parser
-
     response = chain.invoke({"content": content})
+    print(response)
     return response
 
 
 def gen_algorithm(content) -> str:
+    from fileIO import write_files
+
     prompt = ChatPromptTemplate.from_template(
         "You are an advanced and professional programmer with in-depth knowledge of all programming languages. Given the code provided in {content}, write an algorithm explaining each step of how the code works. If there are multiple functions or classes, explain them separately with clarity. Return the explanation in markdown format only, without any additional summaries or interpretations. Do not provide any content other than the markdown explanation."
     )
@@ -54,10 +57,11 @@ def gen_algorithm(content) -> str:
     write_files([{"filename": "algorithm.md", "content": response}], False)
     return response
 
+
 def gen_mermaid(text) -> str:
-    
+
     content = gen_algorithm(text)
-    
+
     prompt = ChatPromptTemplate.from_template(
         """Generate a concise and clear Mermaid diagram that visually represents the logical flow of the given algorithm. Break down the algorithm into simple, understandable steps while maintaining a clear structure. Focus on showing the primary actions, decisions, and loops in the algorithm. Keep the flowchart as minimal as possible, without excessive steps or complexity.
         
@@ -92,7 +96,10 @@ def gen_mermaid(text) -> str:
     response = chain.invoke({"content": content})
     return response
 
+
 def gen_guide(content) -> str:
+    from fileIO import write_files
+
     prompt = ChatPromptTemplate.from_template(
         """ Generate a concise documentation for a given codebase, similar to popular API or language docs. The documentation should cover:
 

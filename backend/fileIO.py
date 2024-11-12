@@ -1,13 +1,15 @@
 import os
 
 from flask import Request
-
 from zipfile import ZipFile
-from typing import List, Any
+from zipfile import ZIP_DEFLATED
+from io import BytesIO
+from ai import gen_docstring
 
 PUBLIC_DIR = "uploads"
-
 os.makedirs(PUBLIC_DIR, exist_ok=True)
+CLONED_REPO = "cloned_repos"
+os.makedirs(CLONED_REPO, exist_ok=True)
 
 
 def strip_backticks(code):
@@ -26,7 +28,7 @@ def write_files(file_records, remove_backticks=True):
         filename = file_data.get("filename")
         content = file_data.get("content")
 
-        if(remove_backticks):
+        if remove_backticks:
             content = strip_backticks(content)
 
         if not filename or not content:
@@ -83,6 +85,7 @@ def read_files(request: Request):
     return file_records
 
 
+
 def read_folder(z, folder_path):
     """Reads all files inside a folder in a ZIP archive."""
     folder_records = []
@@ -107,10 +110,6 @@ def read_folder(z, folder_path):
                 )
 
     return folder_records
-
-    return folder_records
-
-
 
 def read_zip(zip_file):
     file_records = []
@@ -137,5 +136,60 @@ def read_zip(zip_file):
                     file_records.append(
                         {"filename": filename, "fileExt": file_ext, "content": content}
                     )
+
+    return file_records
+
+
+
+BLACKLISTED_EXTENSIONS = {".exe", ".bin", ".dll", ".so", ".pyc", ".class", ".pack", ".idx"}
+BLACKLISTED_PATHS = {".git"}  
+
+def create_file_record(file_path):
+    """Creates a dictionary with file information for a given file path, skipping blacklisted files and directories."""
+    
+    # Skip files in blacklisted directories or with blacklisted extensions
+    if any(blacklist in file_path for blacklist in BLACKLISTED_PATHS):
+        print(f"Skipping file in blacklisted directory: {file_path}")
+        return None
+
+    # Check if the file extension is in the blacklist
+    if os.path.splitext(file_path)[1] in BLACKLISTED_EXTENSIONS:
+        print(f"Skipping blacklisted or binary file: {file_path}")
+        return None
+
+    try:
+        # Attempt to read the file as a UTF-8 text file
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        return {
+            "filename": os.path.basename(file_path),
+            "filePath": file_path,
+            "content": gen_docstring(content),
+        }
+    except UnicodeDecodeError:
+        # If the file cannot be decoded as UTF-8, treat it as binary and skip
+        print(f"Skipping binary or non-UTF-8 file: {file_path}")
+        return None
+    except Exception as e:
+        # Catch any other errors (such as permission errors, etc.)
+        print(f"Error reading file {file_path}: {e}")
+        return None
+
+
+
+def generate_docstring_for_whole_repo(repo_folder_path):
+    """Recursively collects all files in a repository folder, modifies them, and writes the new content."""
+    file_records = []
+
+    for root, _, files in os.walk(repo_folder_path):
+        for file_name in files:
+            file_path = os.path.join(root, file_name)
+            file_record = create_file_record(file_path)
+            if file_record:
+                # Write the modified content back to the original file
+                with open(file_record["filePath"], "w", encoding="utf-8") as f:
+                    f.write(file_record["content"])
+
+                file_records.append(file_record)
 
     return file_records
