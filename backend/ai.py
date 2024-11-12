@@ -49,7 +49,6 @@ def gen_algorithm(content) -> str:
         api_key=key,
     )
     output_parser = StrOutputParser()
-
     chain = prompt | model | output_parser
     response = chain.invoke({"content": content})
     write_files([{"filename": "algorithm.md", "content": response}], False)

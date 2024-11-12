@@ -99,9 +99,7 @@ def read_folder(z, folder_path):
                     content = f.read().decode("utf-8")
                 except UnicodeDecodeError:
                     # Handle binary or non-UTF-8 files
-                    content = No
-                    
-                    ne
+                    content = None
 
                 # Append file information to folder records
                 folder_records.append(
@@ -109,6 +107,9 @@ def read_folder(z, folder_path):
                 )
 
     return folder_records
+
+    return folder_records
+
 
 
 def read_zip(zip_file):

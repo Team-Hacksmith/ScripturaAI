@@ -40,6 +40,7 @@ def upload_file():
 
     return {"files": output_file_records}, 200
 
+
 @app.route("/genalgo", methods=["POST"])
 def generate_algorithm():
     data = request.get_json()
