@@ -4,8 +4,9 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain_openai import ChatOpenAI
-from fileIO import write_files
+from fileIO import write_files, strip_backticks
 from langchain_google_genai import ChatGoogleGenerativeAI
+
 
 import os
 
@@ -63,7 +64,7 @@ def gen_mermaid(text) -> str:
     content = gen_algorithm(text)
 
     prompt = ChatPromptTemplate.from_template(
-        """Generate a concise and clear Mermaid diagram that visually represents the logical flow of the given algorithm. Break down the algorithm into simple, understandable steps while maintaining a clear structure. Focus on showing the primary actions, decisions, and loops in the algorithm. Keep the flowchart as minimal as possible, without excessive steps or complexity.
+        """Generate a concise and clear Mermaid diagram that visually represents the logical flow of the given algorithm. Break down the algorithm into simple, understandable steps while maintaining a clear structure. Focus on showing the primary actions, decisions, and loops in the algorithm. Keep the flowchart as minimal as possible, without excessive steps or complexity. There should not be any double quotes, or any kind of brackets between [] for example B[Include Libraries: ()[] "<iostream>"] all of this is not allowed no brackets or double quotes allowed in mermaid. Do not at any cost give any sort of text explaination and only and only give mermaid output.
         
         The flowchart should include:
 
@@ -75,7 +76,7 @@ def gen_mermaid(text) -> str:
         - Output/Result (final outcome, return values, or results to display)
         - End (completion of the algorithm)
         - Use simple shapes and clear connections, avoiding unnecessary details. Focus on the logical flow of the algorithm, from start to end.
-
+        
         Algorithm: {content}"""
     )
 
@@ -92,8 +93,8 @@ def gen_mermaid(text) -> str:
     output_parser = StrOutputParser()
 
     chain = prompt | model | output_parser
-
     response = chain.invoke({"content": content})
+    response = strip_backticks(response)
     return response
 
 
