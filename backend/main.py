@@ -50,7 +50,6 @@ def generate_algorithm():
         text = data["text"]
         gen_algorithm(text)
         return jsonify({"content": text}), 200
-
     else:
         return jsonify({"error": "No text data provided"}), 400
 
@@ -76,10 +75,8 @@ def generate_guide():
         gen_guide(text)
         # write_files({"filename": "userGuide.md", "content": res}, False)
         return jsonify({"content": text}), 200
-
     else:
         return jsonify({"error": "No text data provided"}), 400
-
 
 @app.route("/single", methods=["POST"])
 def single():
