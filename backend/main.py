@@ -7,12 +7,13 @@ from github_routes import clone_repo
 
 app = Flask(__name__)
 
+PUBLIC_DIR = "uploads"
+
 
 @app.route("/", methods=["GET"])
 def home():
     return "Hello World"
 
-PUBLIC_DIR = "uploads"
 
 
 @app.route("/upload", methods=["POST"])
