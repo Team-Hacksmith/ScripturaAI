@@ -1,7 +1,7 @@
 import os
-from ai import gen_docstring, gen_algorithm, gen_mermaid, gen_guide
+from fileIO import read_files, strip_backticks, write_files
 from flask import Flask, request, jsonify
-from fileIO import read_files, write_files
+from ai import gen_docstring, gen_algorithm, gen_mermaid, gen_guide
 from github_routes import clone_repo
 
 
@@ -43,46 +43,29 @@ def upload_file():
     return {"files": output_file_records}, 200
 
 
-@app.route("/genalgo", methods=["POST"])
-def generate_algorithm():
-    data = request.get_json()
-    if data and "text" in data:
-        text = data["text"]
-        gen_algorithm(text)
-        return jsonify({"content": text}), 200
-    else:
-        return jsonify({"error": "No text data provided"}), 400
-
-
-@app.route("/genMermaid", methods=["POST"])
-def generate_mermaid():
-    data = request.get_json()
-    if data and "text" in data:
-        text = data["text"]
-        res = gen_mermaid(text)
-        # write_files(res)
-        return jsonify({"content": res}), 200
-
-    else:
-        return jsonify({"error": "No text data provided"}), 400
-
-
-@app.route("/genGuide", methods=["POST"])
-def generate_guide():
-    data = request.get_json()
-    if data and "text" in data:
-        text = data["text"]
-        gen_guide(text)
-        # write_files({"filename": "userGuide.md", "content": res}, False)
-        return jsonify({"content": text}), 200
-    else:
-        return jsonify({"error": "No text data provided"}), 400
-
 @app.route("/single", methods=["POST"])
 def single():
     request_data = request.get_json()
+    gen_type = request_data.get("type")
 
-    return {"content": gen_docstring(request_data.get("content"))}
+    if (not gen_type) or (gen_type not in ["code", "algo", "guide", "diagram"]):
+        raise ValueError("Invalid type")
+
+    result = ""
+
+    match gen_type:
+        case "code":
+            result = gen_docstring(request_data.get("content"))
+        case "algo":
+            result = gen_algorithm(request_data.get("content"))
+        case "guide":
+            result = gen_guide(request_data.get("content"))
+        case "diagram":
+            result = gen_mermaid(request_data.get("content"))
+        case _:
+            raise ValueError("Invalid type")
+
+    return {"content": strip_backticks(result), "type": gen_type}
 
 
 @app.route("/cloneRepo", methods=["POST"])
