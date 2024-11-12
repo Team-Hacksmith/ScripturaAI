@@ -2,6 +2,7 @@
 import Markdown from "react-markdown";
 import CodeEditor from "../ui/CodeEditor";
 import { OutputType } from "./types";
+import Mermaid from "@/components/Mermaid";
 
 type Props = {
   output: string;
@@ -19,7 +20,7 @@ const SingleCodeOutput = ({ lang, output, type }: Props) => {
     case "code":
       return <CodeEditor language={lang} onChange={() => {}} value={output} />;
     case "diagram":
-      return <p>{JSON.stringify(output, null, 2)}</p>;
+      return <Mermaid chart={output} />;
     default:
       throw new Error("Invalid output type");
   }
