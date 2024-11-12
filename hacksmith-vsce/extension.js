@@ -38,6 +38,12 @@ function activate(context) {
 				});
 	
 				const data = await response.json();
+				const generatedText = data.content; // Extract and format the generated code
+	
+				// Replace the selected text with the formatted generated result
+				await editor.edit(editBuilder => {
+					editBuilder.replace(selection, generatedText);
+				});
 			
 			
 				vscode.window.showInformationMessage(`Generated Result: ${JSON.stringify(data)}`);
