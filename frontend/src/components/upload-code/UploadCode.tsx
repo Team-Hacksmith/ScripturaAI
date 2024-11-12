@@ -4,7 +4,6 @@ import { ArrowDown, FileIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import Dropzone from "react-dropzone";
 import { Button } from "../ui/button";
-import DownloadCode from "./DownloadCode";
 import { getMultipleGenerationAction } from "@/lib/actions";
 
 const UploadCode = () => {
