@@ -3,12 +3,11 @@ import os
 from flask import Request
 
 from zipfile import ZipFile
-from typing import List, Any
 
 PUBLIC_DIR = "uploads"
 os.makedirs(PUBLIC_DIR, exist_ok=True)
-PUBLIC_DIR = "uploads"
-os.makedirs(PUBLIC_DIR, exist_ok=True)
+CLONED_REPO = "cloned_repos"
+os.makedirs(CLONED_REPO, exist_ok=True)
 
 def strip_backticks(code):
     if code.startswith("```") and code.endswith("```"):

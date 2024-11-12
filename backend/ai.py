@@ -54,3 +54,49 @@ def gen_algorithm(content) -> str:
     write_files([{"filename": "algorithm.md", "content": response}], False)
 
     return response
+
+
+def gen_mermaid(text) -> str:
+    
+    content = gen_algorithm(text)
+    
+    prompt = ChatPromptTemplate.from_template(
+        "Please make a mermaid file using this algorithm: {content}. Your response should only be in mermaid no text is needed."
+    )
+
+    key = SecretStr(os.getenv("GEMINI_API_KEY", ""))
+
+    if key == "":
+        raise Exception("Gemini API Key not set")
+
+    model = ChatGoogleGenerativeAI(
+        model="gemini-pro",
+        temperature=0.6,
+        api_key=key,
+    )
+    output_parser = StrOutputParser()
+
+    chain = prompt | model | output_parser
+
+    response = chain.invoke({"content": content})
+    return response
+
+def gen_guide(content) -> str:
+    prompt = ChatPromptTemplate.from_template(
+        "Please analyse this code: {content}. Find patterns and return a markdown response for this explaining this code like a documentation you can refer popular documentation pages and then try to explain the code using markdown."
+    )
+    key = SecretStr(os.getenv("GEMINI_API_KEY", ""))
+
+    if key == "":
+        raise Exception("Gemini API key not set")
+
+    model = ChatGoogleGenerativeAI(
+        model="gemini-pro",
+        temperature=0.4,
+        api_key=key,
+    )
+    output_parser = StrOutputParser()
+    chain = prompt | model | output_parser
+    response = chain.invoke({"content": content})
+    write_files([{"filename": "userGuide.md", "content": response}], False)
+    return response
