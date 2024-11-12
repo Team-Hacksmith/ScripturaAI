@@ -101,28 +101,15 @@ def gen_guide(content) -> str:
     from fileIO import write_files
 
     prompt = ChatPromptTemplate.from_template(
-        """ Generate a concise documentation for a given codebase, similar to popular API or language docs. The documentation should cover:
-
-            Overview: Briefly describe the purpose of the code.
-            Prerequisites: List required libraries or setup steps.
-            Class & Function Details:
-            For each class/function:
-            Description of its purpose.
-            Parameters and Return Values.
-            Code Example for usage.
-            Main Workflow: Explain the main function and core logic.
-            Output: Describe expected output with examples.
-            Usage: Provide a quick start guide for running the code.
-            Extensions (Optional): Mention potential improvements.
-            Ensure clarity, conciseness, and use code blocks where necessary to aid readability.
-
-            Content: {content}
-"""
+        """ Generate a concise documentation for a given codebase, similar to popular API or language docs. The documentation should cover all the essential things needed in a codebase documentation. 
+        Ensure clarity, conciseness, and use code blocks where necessary to aid readability. 
+        Content:  {content}
+        """
     )
-    key = SecretStr(os.getenv("GEMINI_API_KEY", ""))
+    key = SecretStr(os.getenv("OPENAI_API_KEY", ""))
 
     if key == "":
-        raise Exception("Gemini API key not set")
+        raise Exception("OpenAI API key not set")
 
     model = ChatOpenAI(
         model="gpt-4o-mini",
