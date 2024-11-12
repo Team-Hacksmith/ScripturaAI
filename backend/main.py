@@ -20,6 +20,11 @@ def home():
 @app.route("/upload", methods=["POST"])
 def upload_file():
     file_records = read_files(request)
+    gen_type = request.form.get("type")
+
+    if (not gen_type) or (gen_type not in ["code", "algo", "guide", "diagram"]):
+        raise ValueError("Invalid type")
+
     output_file_records = []
 
     for file_data in file_records:
@@ -30,11 +35,28 @@ def upload_file():
         if not filename or not content or not fileExt:
             raise ValueError("Invalid data")
 
+        result = ""
+
+        match gen_type:
+            case "code":
+                result = gen_docstring(content)
+            case "algo":
+                result = gen_algorithm(content)
+                filename = filename.rsplit(".", 1)[0] + ".md"
+            case "guide":
+                result = gen_guide(content)
+                filename = filename.rsplit(".", 1)[0] + ".md"
+            case "diagram":
+                result = gen_mermaid(content)
+                filename = filename.rsplit(".", 1)[0] + ".mmd"
+            case _:
+                raise ValueError("Invalid type")
+
         output_file_records.append(
             {
                 "filename": filename,
                 "fileExt": fileExt,
-                "content": gen_docstring(content),
+                "content": result,
             }
         )
 
