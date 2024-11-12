@@ -24,6 +24,7 @@
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-markdown": "^9.0.1",
     "sonner": "^1.7.0",
+    "react-mermaid2": "^0.1.4",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7"
   },
