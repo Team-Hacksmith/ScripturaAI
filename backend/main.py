@@ -1,30 +1,33 @@
-from flask import Flask, request, jsonify
-
-from langchain_google_genai import ChatGoogleGenerativeAI
-
-import getpass
 import os
-
-if "GOOGLE_API_KEY" not in os.environ:
-    os.environ["GOOGLE_API_KEY"] = getpass.getpass("Provide your Google API Key")
+from flask import Flask, request
 
 app = Flask(__name__)
 
-# Initialize ChatGoogleGenerativeAI with Google Gemini Pro model
-# Ensure that GOOGLE_API_KEY and LANGCHAIN_API_KEY are set in your environment variables
-chat_model = ChatGoogleGenerativeAI(model="gemini-pro")
-
 
 @app.route("/", methods=["GET"])
-def generate_content():
-    prompt = "Hi"
+def home():
+    return "Hello world"
 
-    if not prompt:
-        return jsonify({"error": "Prompt is required"}), 400
 
-    # Generate content based on the prompt
-    try:
-        response = chat_model.invoke(prompt)
-        return jsonify({"response": response.content})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+@app.route("/upload", methods=["POST"])
+def upload_file():
+    # Check if files are present in the request
+    if "file" not in request.files:
+        return "No file part in the request", 400
+
+    # Get the list of files
+    files = request.files.getlist("file")
+
+    # Print each file's name and content
+    for file in files:
+        print(f"Filename: {file.filename}")
+        print("Content:")
+        print(
+            file.read().decode("utf-8")
+        )  # Assuming the file is a text file; adjust for other file types
+
+    return "Files received and printed successfully", 200
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
