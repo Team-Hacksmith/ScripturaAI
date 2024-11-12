@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SingleCode from "@/components/single-code/SingleCode";
 import UploadCode from "@/components/upload-code/UploadCode";
+import GithubCode from "@/components/github-code/GithubCode";
 
 const Page: React.FC = () => {
   return (
@@ -12,12 +13,17 @@ const Page: React.FC = () => {
           <TabsList className="mb-3">
             <TabsTrigger value="code">Code</TabsTrigger>
             <TabsTrigger value="upload">Upload</TabsTrigger>
+            <TabsTrigger value="github">Github</TabsTrigger>
           </TabsList>
+
           <TabsContent asChild value="code">
             <SingleCode />
           </TabsContent>
           <TabsContent value="upload">
             <UploadCode />
+          </TabsContent>
+          <TabsContent value="github">
+            <GithubCode />
           </TabsContent>
         </Tabs>
       </Card>

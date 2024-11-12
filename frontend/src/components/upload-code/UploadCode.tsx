@@ -1,5 +1,5 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { cn, downloadFile } from "@/lib/utils";
 import { ArrowDown, FileIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import Dropzone from "react-dropzone";
@@ -97,16 +97,8 @@ const UploadCode = () => {
             setIsPending(true);
             const blob = await getMultipleGenerationAction(files, type);
 
-            const url = window.URL.createObjectURL(blob);
+            downloadFile(blob, "files.zip");
 
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", "files.zip");
-            document.body.appendChild(link);
-            link.click();
-
-            link.remove();
-            window.URL.revokeObjectURL(url);
             setIsPending(false);
           }}
           variant={"outline"}

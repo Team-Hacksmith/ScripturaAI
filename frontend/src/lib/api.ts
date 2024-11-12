@@ -33,3 +33,18 @@ export const getMultipleGeneration = async (
   const data = await response.blob();
   return data;
 };
+
+export const getGenerationFromGithub = async (
+  url: string,
+  type: OutputType
+): Promise<Blob> => {
+  const response = await fetch(`${BASE_URL}/cloneRepo`, {
+    method: "POST",
+    body: JSON.stringify({ url, type }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await response.blob();
+  return data;
+};

@@ -17,3 +17,17 @@ export function formatDate(input: string | number): string {
 export function absoluteUrl(path: string) {
   return `${process.env.NEXT_PUBLIC_APP_URL}${path}`;
 }
+
+export function downloadFile(blob: Blob, fileName: string) {
+  if (!window) throw new Error("Don't run this on server");
+  const url = window.URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", fileName);
+  document.body.appendChild(link);
+  link.click();
+
+  link.remove();
+  window.URL.revokeObjectURL(url);
+}

@@ -1,10 +1,12 @@
 import requests
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, send_file
 import os
 import subprocess
 from dotenv import load_dotenv
 import shutil
 from fileIO import generate_docstring_for_whole_repo, write_files
+import io
+
 load_dotenv()
 
 GITHUB_API_URL = "https://api.github.com"
@@ -12,14 +14,25 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 CLONE_DIR = "cloned_repos"
 
 
-
 def zip_repo(repo_name):
     repo_path = os.path.join(CLONE_DIR, repo_name)
     if not os.path.isdir(repo_path):
-        jsonify({"error": f"Repository {repo_name} does not exist"}), 400
+        raise FileNotFoundError(f"Repository {repo_name} does not exist.")
 
+    # Create the zip file on disk
     zip_file_path = shutil.make_archive(repo_path, "zip", repo_path)
-    return zip_file_path
+
+    # Read the zip file into memory
+    zip_buffer = io.BytesIO()
+    with open(zip_file_path, "rb") as f:
+        zip_buffer.write(f.read())
+
+    # Delete the zip file from disk after reading
+    os.remove(zip_file_path)
+
+    # Reset buffer position to the beginning
+    zip_buffer.seek(0)
+    return zip_buffer
 
 
 def delete_repo(repo_name):
@@ -38,12 +51,11 @@ def delete_repo(repo_name):
         return jsonify({"error": f"Failed to delete repository: {str(e)}"}), 500
 
 
-
 def clone_repo(repo_url):
     if not repo_url:
         return jsonify({"error": "Missing 'repo_url' parameter"}), 400
-    repo_name = repo_url.strip("/").split("/")[-1]
 
+    repo_name = repo_url.strip("/").split("/")[-1]
     clone_path = os.path.join(CLONE_DIR, repo_name)
 
     if os.path.isdir(clone_path):
@@ -55,13 +67,15 @@ def clone_repo(repo_url):
     except subprocess.CalledProcessError as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": f"Failed to clone the repository: {str(e)}"}), 500
-    zip_file_path = zip_repo(repo_name)
-    generate_docstring_for_whole_repo(CLONE_DIR + "/" + repo_name)
-    
-    return jsonify(
-        {
-            "message": f"Repository '{repo_name}' cloned successfully. And zipped successfully",
-            "repo": repo_name,
-            "repo_url": repo_url
-        }
+
+    generate_docstring_for_whole_repo(os.path.join(CLONE_DIR, repo_name))
+    # Zip the repository into an in-memory buffer
+    zip_buffer = zip_repo(repo_name)
+
+    # Send the zip file as a downloadable response
+    return send_file(
+        zip_buffer,
+        as_attachment=True,
+        download_name=f"{repo_name}.zip",
+        mimetype="application/zip",
     )

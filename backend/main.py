@@ -99,10 +99,10 @@ def single():
 
 @app.route("/cloneRepo", methods=["POST"])
 def cloneRepo():
-    repo_url = request.json.get("repo_url")
+    repo_url = request.json.get("url")
 
     if not repo_url:
-        return jsonify({"error": "Missing repo_url parameter"}), 400
+        return jsonify({"error": "Missing url parameter"}), 400
 
     # Call the clone_repo function to clone the repo
     return clone_repo(repo_url)

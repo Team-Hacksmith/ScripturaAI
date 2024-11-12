@@ -195,7 +195,7 @@ def create_file_record(file_path):
         return {
             "filename": os.path.basename(file_path),
             "filePath": file_path,
-            "content": gen_docstring(content),
+            "content": strip_backticks(gen_docstring(content)),
         }
     except UnicodeDecodeError:
         # If the file cannot be decoded as UTF-8, treat it as binary and skip

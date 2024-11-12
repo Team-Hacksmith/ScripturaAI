@@ -1,7 +1,11 @@
 "use server";
 
 import { OutputType } from "@/components/single-code/types";
-import { getMultipleGeneration, getSingleGeneration } from "./api";
+import {
+  getGenerationFromGithub,
+  getMultipleGeneration,
+  getSingleGeneration,
+} from "./api";
 import { GetSingleGenerationResponse } from "./types";
 
 export const getSingleGenerationAction = async (
@@ -17,5 +21,13 @@ export const getMultipleGenerationAction = async (
   type: OutputType
 ): Promise<Blob> => {
   const data = await getMultipleGeneration(files, type);
+  return data;
+};
+
+export const getGenerationFromGithubAction = async (
+  url: string,
+  type: OutputType
+) => {
+  const data = await getGenerationFromGithub(url, type);
   return data;
 };
