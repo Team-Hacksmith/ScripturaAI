@@ -8,22 +8,13 @@ os.makedirs(PUBLIC_DIR, exist_ok=True)
 
 
 def strip_backticks(code):
-    # Check if the code starts and ends with backticks
     if code.startswith("```") and code.endswith("```"):
-        # Remove the opening backticks and language identifier
-        code = code[3:]  # Remove '```' from the start
-
-        # Find the index of the first newline after the language identifier
+        code = code[3:]  
         first_newline_index = code.find("\n")
-
-        # If a newline exists after the language identifier, remove the first line
         if first_newline_index != -1:
-            # Skip the first line and keep the rest of the code
             code = code[first_newline_index + 1 :]
-
-        # Remove any trailing backticks (```) from the end
+            
         code = code.rstrip("`")
-
     return code
 
 
