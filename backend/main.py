@@ -58,7 +58,6 @@ def generate_mermaid():
     if(data and "text" in data):
         text = data["text"]
         res = gen_mermaid(text)
-        # write_files(res)
         return jsonify({"content": res}), 200
     
     else:
