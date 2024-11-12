@@ -1,5 +1,5 @@
 import os
-from ai import gen_docstring, gen_algorithm
+from ai import gen_docstring, gen_algorithm, gen_mermaid, gen_guide
 from flask import Flask, request, jsonify
 from fileIO import read_files, write_files
 
@@ -47,12 +47,34 @@ def generate_algorithm():
     if(data and "text" in data):
         text = data["text"]
         gen_algorithm(text)
-        return jsonify({"received_text": text}), 200
+        return jsonify({"content": text}), 200
     
     else:
         return jsonify({"error": "No text data provided"}), 400
     
+@app.route("/genMermaid", methods=["POST"])
+def generate_mermaid():
+    data = request.get_json()
+    if(data and "text" in data):
+        text = data["text"]
+        res = gen_mermaid(text)
+        # write_files(res)
+        return jsonify({"content": res}), 200
     
+    else:
+        return jsonify({"error": "No text data provided"}), 400
+    
+@app.route("/genGuide", methods=["POST"])
+def generate_guide():
+    data = request.get_json()
+    if(data and "text" in data):
+        text = data["text"]
+        gen_guide(text)
+        # write_files({"filename": "userGuide.md", "content": res}, False)
+        return jsonify({"content": text}), 200
+    
+    else:
+        return jsonify({"error": "No text data provided"}), 400
 
 @app.route("/single", methods=["POST"])
 def single():
