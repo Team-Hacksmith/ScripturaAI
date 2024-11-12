@@ -1,49 +1,74 @@
 import os
-from flask import Flask, request
-from fileIO import write_to_file
+from ai import gen_docstring, gen_algorithm
+from flask import Flask, request, jsonify
+from fileIO import read_files, write_files
+from github_routes import clone_repo
 app = Flask(__name__)
 
-app = Flask(__name__)
+PUBLIC_DIR = "uploads"
 
-# Define the public directory to save files
-PUBLIC_DIR = 'public'
-
-# Ensure the public directory exists
 os.makedirs(PUBLIC_DIR, exist_ok=True)
+
+
+@app.route("/", methods=["GET"])
+def home():
+    return "Hello World"
+
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    # Check if files are present in the request
-    if "file" not in request.files:
-        return "No file part in the request", 400
+    file_records = read_files(request)
+    output_file_records = []
 
-    # Get the list of files
-    files = request.files.getlist("file")
+    for file_data in file_records:
+        filename = file_data.get("filename", None)
+        content = file_data.get("content", None)
+        fileExt = file_data.get("fileExt", None)
 
-    # Initialize a list to store file details
-    file_records = []
+        if not filename or not content or not fileExt:
+            raise ValueError("Invalid data")
 
-    # Process each file
-    for file in files:
-        # Extract the filename and file extension
-        filename = file.filename
-        file_ext = filename.rsplit(".", 1)[-1] if "." in filename else ""
+        output_file_records.append(
+            {
+                "filename": filename,
+                "fileExt": fileExt,
+                "content": gen_docstring(content),
+            }
+        )
 
-        # Read file content and decode it (assuming it's a text file)
-        content = file.read().decode("utf-8")  # Adjust decoding if dealing with non-text files
+    write_files(output_file_records)
 
-        # Create a dictionary for the current file
-        file_info = {"filename": filename, "fileExt": file_ext, "content": content}
+    return {"files": output_file_records}, 200
 
-        # Add the file info dictionary to the list
-        file_records.append(file_info)
 
-    # Call the function to save the files in the public folder
-    write_to_file(file_records)
+@app.route("/genalgo", methods=["POST"])
+def generate_algorithm():
+    data = request.get_json()
+    if(data and "text" in data):
+        text = data["text"]
+        gen_algorithm(text)
+        return jsonify({"received_text": text}), 200
+    
+    else:
+        return jsonify({"error": "No text data provided"}), 400
+    
+    
 
-    # Return the list of file records as a JSON response
-    return {"files": file_records}, 200
+@app.route("/single", methods=["POST"])
+def single():
+    request_data = request.get_json()
 
+    return {"content": gen_docstring(request_data.get("content"))}
+
+@app.route("/cloneRepo", methods=["POST"])
+def cloneRepo():
+    repo_url = request.json.get("repo_url")
+
+    if not repo_url:
+        return jsonify({"error": "Missing repo_url parameter"}), 400
+
+    # Call the clone_repo function to clone the repo
+    return clone_repo(repo_url)
 
 
 if __name__ == "__main__":
