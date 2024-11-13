@@ -2,9 +2,8 @@ import os
 from fileIO import read_files, strip_backticks, write_files_to_memory
 from flask import Flask, request, jsonify, send_file
 from ai import gen_docstring, gen_algorithm, gen_mermaid, gen_guide, gen_markdown
-from github_routes import clone_repo, generate_mkdocs_yml
-import yaml, subprocess
-import shutil
+from github_routes import clone_repo
+import subprocess
 
 app = Flask(__name__)
 
