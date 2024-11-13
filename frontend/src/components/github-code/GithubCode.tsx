@@ -5,14 +5,15 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import FakeProgress from "../ui/fake-progress";
 
 const GithubCode = () => {
   const [isPending, setIsPending] = useState(false);
   const [url, setUrl] = useState("");
 
   return (
-    <div className="max-w-lg mx-auto py-10 flex flex-col items-center justify-center gap-2 min-h-[768px]">
-      <div className="flex flex-col gap-2 w-full">
+    <div className="relative py-10 flex flex-col items-center justify-center gap-2 min-h-[768px]">
+      <div className="flex max-w-lg mx-auto flex-col gap-2 w-full">
         <Label>Enter a public github URL to clone and generate docs for:</Label>
         <Input
           autoFocus
@@ -35,6 +36,7 @@ const GithubCode = () => {
           Generate
         </Button>
       </div>
+      <FakeProgress className="bottom-full w-full" isPending={isPending} />
     </div>
   );
 };

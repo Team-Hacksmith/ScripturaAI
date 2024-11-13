@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { ArrowUpRight } from "lucide-react";
+import FakeProgress from "../ui/fake-progress";
 
 const GithubWebsite = () => {
   const [isPending, setIsPending] = useState(false);
@@ -14,8 +15,8 @@ const GithubWebsite = () => {
   const [title, setTitle] = useState("");
 
   return (
-    <div className="max-w-lg mx-auto py-10 flex flex-col items-center justify-center gap-2 min-h-[768px]">
-      <div className="flex flex-col gap-5 w-full">
+    <div className="relative w-full mx-auto flex flex-col items-center justify-center gap-2 min-h-[768px]">
+      <div className="flex flex-col gap-5  py-10 max-w-sm">
         <fieldset>
           <Label>Enter the title for your website:</Label>
           <Input
@@ -91,6 +92,7 @@ const GithubWebsite = () => {
           </Button>
         )}
       </div>
+      <FakeProgress className="bottom-full w-full" isPending={isPending} />
     </div>
   );
 };

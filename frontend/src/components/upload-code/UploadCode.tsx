@@ -14,6 +14,7 @@ import {
 } from "../ui/select";
 import { supported_types } from "@/lib/config";
 import { OutputType } from "../single-code/types";
+import FakeProgress from "../ui/fake-progress";
 
 const UploadCode = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -35,7 +36,7 @@ const UploadCode = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="relative flex flex-col items-center gap-5">
       <div className="flex flex-col lg:flex-row w-full gap-10">
         <Dropzone onDrop={(acceptedFiles) => addFiles(acceptedFiles)}>
           {({ getRootProps, getInputProps, isDragActive }) => (
@@ -111,6 +112,7 @@ const UploadCode = () => {
           {!isPending && <ArrowDown />}
         </Button>
       </div>
+      <FakeProgress className="bottom-full w-full" isPending={isPending} />
     </div>
   );
 };

@@ -17,6 +17,7 @@ import SingleCodeOutput from "./SingleCodeOutput";
 import { OutputType, SingleCodeOutput as SingleCodeOutputT } from "./types";
 import { Progress } from "../ui/progress";
 import { cn } from "@/lib/utils";
+import FakeProgress from "../ui/fake-progress";
 
 const SingleCode = () => {
   const [value, setValue] = useState("");
@@ -25,25 +26,10 @@ const SingleCode = () => {
   const [outputs, setOutputs] = useState<SingleCodeOutputT[]>([]);
   const [isPending, setIsPending] = useState(false);
   const [lang, setLang] = useState(supported_languages[0]);
-  const [progress, setProgress] = useState(0);
 
   const createOutput = (output: SingleCodeOutputT) => {
     setOutputs((op) => [...op, output]);
   };
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (isPending) {
-      interval = setInterval(() => {
-        setProgress((prev) => Math.min(prev + 5, 95));
-      }, 500);
-    } else {
-      setProgress(0);
-    }
-    return () => clearInterval(interval);
-  }, [isPending]);
-
   return (
     <div className="space-y-2">
       <div className="flex flex-col xl:flex-row gap-5">
@@ -105,13 +91,7 @@ const SingleCode = () => {
           </Button>
         </div>
         <div className="xl:flex-1 relative">
-          <Progress
-            className={cn("absolute z-10 transition-opacity", {
-              "opacity-0": !isPending,
-              "opacity-100": isPending,
-            })}
-            value={progress}
-          />
+          <FakeProgress isPending={isPending} />
           {outputs.length > 0 ? (
             <Tabs className="relative" defaultValue={outputs[0].type + 0}>
               <TabsList className="absolute z-10 bottom-full mb-3">
