@@ -1,12 +1,17 @@
 import os
+import threading
+
 from fileIO import read_files, strip_backticks, write_files_to_memory
 from flask import Flask, request, jsonify, send_file
 from ai import gen_docstring, gen_algorithm, gen_mermaid, gen_guide, gen_markdown
 from github_routes import clone_repo
 import subprocess
+from flask_cors import CORS
 import shutil
 
 app = Flask(__name__)
+cors = CORS(app)  # allow CORS for all domains on all routes.
+app.config["CORS_HEADERS"] = "Content-Type"
 
 PUBLIC_DIR = "uploads"
 
@@ -122,6 +127,24 @@ import os
 import subprocess
 from flask import jsonify
 
+mkdocs_processes = {}  # Dictionary to store active processes by site name
+
+
+def run_mkdocs_serve(site_name, port):
+    process = subprocess.Popen(
+        f"mkdocs serve --dev-addr=0.0.0.0:{port}", shell=True, cwd=site_name
+    )
+    mkdocs_processes[site_name] = process
+
+
+def cleanup_site(site_name):
+    # Terminate mkdocs serve process if it's running
+    process = mkdocs_processes.get(site_name)
+    if process and process.poll() is None:  # Check if process is still running
+        process.terminate()  # Gracefully terminate the process
+        process.wait()  # Wait for termination to complete
+        print(f"Terminated mkdocs serve for {site_name}")
+
 
 @app.route("/generateWebsite", methods=["POST"])
 def generateWebsite():
@@ -132,34 +155,34 @@ def generateWebsite():
 
     site_name = data["site_name"]
     repo_url = data["repo_url"]
+    port = data["port"]
 
     repo_name = os.path.splitext(os.path.basename(repo_url))[0]
 
     if not os.path.exists(site_name):
-        os.makedirs(site_name)  
+        os.makedirs(site_name)
 
     mkdocs_yml_path = os.path.join(site_name, "mkdocs.yml")
     with open(mkdocs_yml_path, "w") as yml_file:
         yml_file.write(f"site_name: {site_name}\n")
-        yml_file.write(f"docs_dir: docs\n")  
-
+        yml_file.write(f"docs_dir: docs\n")
         yml_file.write("theme:\n")
-        yml_file.write("  name: material\n")  
+        yml_file.write("  name: material\n")
 
     mkdocs_dir = os.path.join(site_name, "docs")
-    os.makedirs(mkdocs_dir, exist_ok=True) 
+    os.makedirs(mkdocs_dir, exist_ok=True)
 
     cloned_repo_path = os.path.join("cloned_repos", repo_name)
 
     git_dir = os.path.join(cloned_repo_path, ".git")
     if not os.path.exists(cloned_repo_path):
-        os.makedirs("cloned_repos", exist_ok=True)  
+        os.makedirs("cloned_repos", exist_ok=True)
         clone_cmd = f"git clone {repo_url} {cloned_repo_path}"
         subprocess.run(clone_cmd, shell=True, check=True)
 
     if os.path.isdir(git_dir):
         print(f"Deleting .git folder in {cloned_repo_path}")
-        shutil.rmtree(git_dir)  
+        shutil.rmtree(git_dir)
         print(f"Deleted .git folder in {cloned_repo_path}")
     else:
         print(f".git folder not found in {cloned_repo_path}, skipping deletion.")
@@ -182,7 +205,6 @@ def generateWebsite():
             file_ext = os.path.splitext(filename)[1]
 
             if file_ext in blacklisted_extensions:
-                print(f"Skipping {filename} due to blacklisted extension.")
                 continue
 
             try:
@@ -190,35 +212,43 @@ def generateWebsite():
                     content = file.read()
 
                 processed_content = gen_markdown(content)
-
                 if processed_content:
                     markdown_filename = os.path.join(
                         mkdocs_dir, f"{os.path.splitext(filename)[0]}.md"
                     )
                     with open(markdown_filename, "w", encoding="utf-8") as md_file:
                         md_file.write(processed_content)
-                    print(f"Saved {markdown_filename}")
-                else:
-                    print(f"Failed to process {filename} or file is blacklisted.")
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
 
-    try:
-        subprocess.run(
-            "mkdocs serve --dev-addr=0.0.0.0:8001",
-            shell=True,
-            check=True,
-            cwd=site_name,
-        )
-
-        print("MkDocs build completed successfully.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error during mkdocs build: {e}")
+    # Start mkdocs serve in a new thread
+    thread = threading.Thread(target=run_mkdocs_serve, args=(site_name, port))
+    thread.start()
 
     return (
-        jsonify({"success": f"Website created with markdown files in {mkdocs_dir}"}),
+        jsonify(
+            {
+                "url": f"http://localhost:{port}",
+                "success": f"Website created with markdown files in {mkdocs_dir}",
+            }
+        ),
         200,
     )
+
+
+@app.route("/stopServer", methods=["POST"])
+def stop_server():
+    data = request.get_json()
+    site_name = data.get("site_name")
+
+    if site_name and site_name in mkdocs_processes:
+        cleanup_site(site_name)
+        return (
+            jsonify({"success": f"Server for {site_name} stopped and cleaned up."}),
+            200,
+        )
+    else:
+        return jsonify({"error": "Site not found or already stopped."}), 404
 
 
 if __name__ == "__main__":

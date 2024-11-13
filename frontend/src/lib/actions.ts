@@ -2,6 +2,7 @@
 
 import { OutputType } from "@/components/single-code/types";
 import {
+  generateGithubWebsite,
   getGenerationFromGithub,
   getMultipleGeneration,
   getSingleGeneration,
@@ -29,5 +30,14 @@ export const getGenerationFromGithubAction = async (
   type: OutputType
 ) => {
   const data = await getGenerationFromGithub(url, type);
+  return data;
+};
+
+export const generateGithubWebsiteAction = async (
+  site_name: string,
+  repo_url: string,
+  port: string
+) => {
+  const data = await generateGithubWebsite(site_name, repo_url, port);
   return data;
 };
