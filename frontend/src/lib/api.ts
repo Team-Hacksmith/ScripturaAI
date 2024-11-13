@@ -48,3 +48,15 @@ export const getGenerationFromGithub = async (
   const data = await response.blob();
   return data;
 };
+
+export const generateGithubWebsite = async (site_name: string, repo_url) => {
+  const response = await fetch(`${BASE_URL}/generateWebsite`, {
+    method: "POST",
+    body: JSON.stringify({ site_name, repo_url }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await response.blob();
+  return data;
+};

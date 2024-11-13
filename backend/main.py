@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify, send_file
 from ai import gen_docstring, gen_algorithm, gen_mermaid, gen_guide, gen_markdown
 from github_routes import clone_repo
 import subprocess
+import shutil
 
 app = Flask(__name__)
 
@@ -160,10 +161,18 @@ def generateWebsite():
     cloned_repo_path = os.path.join("cloned_repos", repo_name)
 
     # Clone repository if it doesn't exist in cloned_repos
+    git_dir = os.path.join(cloned_repo_path, ".git")
     if not os.path.exists(cloned_repo_path):
         os.makedirs("cloned_repos", exist_ok=True)  # Ensure parent directory exists
         clone_cmd = f"git clone {repo_url} {cloned_repo_path}"
         subprocess.run(clone_cmd, shell=True, check=True)
+
+    if os.path.isdir(git_dir):
+        print(f"Deleting .git folder in {cloned_repo_path}")
+        shutil.rmtree(git_dir)  # Remove the .git folder
+        print(f"Deleted .git folder in {cloned_repo_path}")
+    else:
+        print(f".git folder not found in {cloned_repo_path}, skipping deletion.")
 
     # Define blacklisted extensions
     blacklisted_extensions = {

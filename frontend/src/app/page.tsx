@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SingleCode from "@/components/single-code/SingleCode";
 import UploadCode from "@/components/upload-code/UploadCode";
 import GithubCode from "@/components/github-code/GithubCode";
+import { SparkleIcon, SparklesIcon } from "lucide-react";
 
 const Page: React.FC = () => {
   return (
@@ -14,6 +15,13 @@ const Page: React.FC = () => {
             <TabsTrigger value="code">Code</TabsTrigger>
             <TabsTrigger value="upload">Upload</TabsTrigger>
             <TabsTrigger value="github">Github</TabsTrigger>
+            <TabsTrigger
+              className="border border-orange-500 data-[state=active]:bg-gradient-to-tr from-orange-500 to-red-600"
+              value="github-website"
+            >
+              <div aria-hidden className=""></div>
+              Generate and Host <SparklesIcon size={16} className="ml-2" />
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent asChild value="code">
@@ -23,6 +31,9 @@ const Page: React.FC = () => {
             <UploadCode />
           </TabsContent>
           <TabsContent value="github">
+            <GithubCode />
+          </TabsContent>
+          <TabsContent value="github-website">
             <GithubCode />
           </TabsContent>
         </Tabs>
