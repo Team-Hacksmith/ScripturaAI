@@ -5,6 +5,7 @@ import SingleCode from "@/components/single-code/SingleCode";
 import UploadCode from "@/components/upload-code/UploadCode";
 import GithubCode from "@/components/github-code/GithubCode";
 import { SparkleIcon, SparklesIcon } from "lucide-react";
+import GithubWebsite from "@/components/github-website/GithubWebsite";
 
 const Page: React.FC = () => {
   return (
@@ -34,7 +35,7 @@ const Page: React.FC = () => {
             <GithubCode />
           </TabsContent>
           <TabsContent value="github-website">
-            <GithubCode />
+            <GithubWebsite />
           </TabsContent>
         </Tabs>
       </Card>

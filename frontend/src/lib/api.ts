@@ -1,6 +1,9 @@
 import { OutputType } from "@/components/single-code/types";
 import { BASE_URL } from "./config";
-import { GetSingleGenerationResponse } from "./types";
+import {
+  GenerateGithubWebsiteResponse,
+  GetSingleGenerationResponse,
+} from "./types";
 
 export const getSingleGeneration = async (
   code: string,
@@ -49,14 +52,18 @@ export const getGenerationFromGithub = async (
   return data;
 };
 
-export const generateGithubWebsite = async (site_name: string, repo_url) => {
+export const generateGithubWebsite = async (
+  site_name: string,
+  repo_url: string,
+  port: string
+): Promise<GenerateGithubWebsiteResponse> => {
   const response = await fetch(`${BASE_URL}/generateWebsite`, {
     method: "POST",
-    body: JSON.stringify({ site_name, repo_url }),
+    body: JSON.stringify({ site_name, repo_url, port }),
     headers: {
       "Content-Type": "application/json",
     },
   });
-  const data = await response.blob();
+  const data = await response.json();
   return data;
 };
