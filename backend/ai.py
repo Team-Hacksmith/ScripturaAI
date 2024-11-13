@@ -1,11 +1,7 @@
-from openai import OpenAI
-from langchain_core.messages import HumanMessage
 from langchain.prompts import ChatPromptTemplate
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain_openai import ChatOpenAI
-from fileIO import write_files, strip_backticks
-from langchain_google_genai import ChatGoogleGenerativeAI
 
 
 import os
@@ -62,6 +58,7 @@ def gen_algorithm(content) -> str:
 def gen_mermaid(text) -> str:
 
     content = gen_algorithm(text)
+    from fileIO import write_files, strip_backticks
 
     prompt = ChatPromptTemplate.from_template(
         """Generate a concise and clear Mermaid diagram that visually represents the logical flow of the given algorithm. Break down the algorithm into simple, understandable steps while maintaining a clear structure. Focus on showing the primary actions, decisions, and loops in the algorithm. Keep the flowchart as minimal as possible, without excessive steps or complexity. There should not be any double quotes, or any kind of brackets between [] for example B[Include Libraries: ()[] "<iostream>"] all of this is not allowed no brackets or double quotes allowed in mermaid. Do not at any cost give any sort of text explaination and only and only give mermaid output.
@@ -121,4 +118,27 @@ def gen_guide(content) -> str:
     chain = prompt | model | output_parser
     response = chain.invoke({"content": content})
     write_files([{"filename": "userGuide.md", "content": response}], False)
+    return response
+
+
+def gen_markdown(content) -> str:
+    from fileIO import write_files
+    import os
+
+    prompt = ChatPromptTemplate.from_template(
+        "Please analyse this code: {content} and generate corresponding markdown for this code, summarizing everything in this code"
+    )
+    key = SecretStr(os.getenv("OPENAI_API_KEY", ""))
+    if not key:
+        raise Exception("Gemini API key not set")
+
+    model = ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0.7,
+        api_key=key,
+    )
+    output_parser = StrOutputParser()
+    chain = prompt | model | output_parser
+    response = chain.invoke({"content": content})
+    # write_files([{"filename": f"{os.path.splitext(filename)[0]}.md", "content": response}], False)
     return response

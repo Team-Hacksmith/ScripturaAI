@@ -1,11 +1,10 @@
-import requests
-from flask import Blueprint, jsonify, request, send_file
-import os
+from flask import jsonify, send_file
 import subprocess
+import os, subprocess, shutil, yaml
 from dotenv import load_dotenv
-import shutil
-from fileIO import generate_docstring_for_whole_repo, write_files
+from fileIO import generate_docstring_for_whole_repo
 import io
+
 
 load_dotenv()
 
@@ -64,6 +63,10 @@ def clone_repo(repo_url):
     try:
         print(f"Cloning repository: git clone {repo_url} {clone_path}")
         subprocess.check_call(["git", "clone", repo_url, clone_path])
+        git_dir = os.path.join(clone_path, ".git")
+        if os.path.isdir(git_dir):
+            shutil.rmtree(git_dir)  # Remove the .git folder
+            print(f"Deleted .git folder in {clone_path}")
     except subprocess.CalledProcessError as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": f"Failed to clone the repository: {str(e)}"}), 500
@@ -79,3 +82,36 @@ def clone_repo(repo_url):
         download_name=f"{repo_name}.zip",
         mimetype="application/zip",
     )
+
+
+def generate_mkdocs_yml(site_name, docs_dir="docs"):
+    # Set up the base structure for mkdocs.yml
+    mkdocs_config = {"site_name": site_name, "docs_dir": docs_dir, "nav": []}
+
+    # Traverse the docs directory to populate navigation
+    for root, _, files in os.walk(docs_dir):
+        rel_path = os.path.relpath(root, docs_dir)
+
+        if rel_path == ".":
+            # Root level files
+            for file in files:
+                if file.endswith(".md"):
+                    page_name = os.path.splitext(file)[0].capitalize()
+                    mkdocs_config["nav"].append({page_name: file})
+        else:
+            # Subdirectories and nested files
+            section = {"name": os.path.basename(root).capitalize(), "items": []}
+            for file in files:
+                if file.endswith(".md"):
+                    page_name = os.path.splitext(file)[0].capitalize()
+                    section["items"].append({page_name: os.path.join(rel_path, file)})
+
+            if section["items"]:
+                mkdocs_config["nav"].append(
+                    {os.path.basename(root).capitalize(): section["items"]}
+                )
+
+    # Save the mkdocs.yml file
+    with open("mkdocs.yml", "w") as f:
+        yaml.dump(mkdocs_config, f, sort_keys=False)
+    print("mkdocs.yml generated with auto-indexed files.")

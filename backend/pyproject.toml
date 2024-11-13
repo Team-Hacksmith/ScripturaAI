@@ -15,7 +15,9 @@ langchain-google-genai = "^2.0.4"
 python-dotenv = "^1.0.1"
 langchain-community = "^0.3.5"
 openai = "^1.54.3"
-langchain-openai = "^0.2.7"
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.5.44"
+langchain-openai = "^0.2.8"
 
 
 [build-system]
