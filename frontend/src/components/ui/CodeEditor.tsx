@@ -36,8 +36,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         scrollBeyondLastLine: false, // Disable scroll beyond last line
         wordWrap: "on", // Enable word wrapping
         padding: {
-          top: 24,
-          bottom: 24,
+          top: 48,
+          bottom: 48,
         },
       }}
     />

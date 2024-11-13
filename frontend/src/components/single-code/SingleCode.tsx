@@ -7,15 +7,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getSingleGenerationAction } from "@/lib/actions";
+import { supported_languages, supported_types } from "@/lib/config";
 import { ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import CodeEditor from "../ui/CodeEditor";
-import { Label } from "../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import SingleCodeOutput from "./SingleCodeOutput";
 import { OutputType, SingleCodeOutput as SingleCodeOutputT } from "./types";
-import { supported_languages, supported_types } from "@/lib/config";
+import { Progress } from "../ui/progress";
+import { cn } from "@/lib/utils";
 
 const SingleCode = () => {
   const [value, setValue] = useState("");
@@ -24,36 +25,45 @@ const SingleCode = () => {
   const [outputs, setOutputs] = useState<SingleCodeOutputT[]>([]);
   const [isPending, setIsPending] = useState(false);
   const [lang, setLang] = useState(supported_languages[0]);
+  const [progress, setProgress] = useState(0);
 
   const createOutput = (output: SingleCodeOutputT) => {
     setOutputs((op) => [...op, output]);
   };
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isPending) {
+      interval = setInterval(() => {
+        setProgress((prev) => Math.min(prev + 5, 95));
+      }, 500);
+    } else {
+      setProgress(0);
+    }
+    return () => clearInterval(interval);
+  }, [isPending]);
+
   return (
     <div className="space-y-2">
-      <fieldset className="flex items-center gap-10">
-        <Label>Language</Label>
-
-        <Select value={lang} onValueChange={setLang}>
-          <SelectTrigger className="capitalize">
-            <SelectValue placeholder="Language" />
-          </SelectTrigger>
-          <SelectContent>
-            {supported_languages.map((language) => (
-              <SelectItem
-                className="capitalize"
-                key={language}
-                value={language}
-              >
-                {language}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </fieldset>
-
       <div className="flex flex-col xl:flex-row gap-5">
-        <div className="xl:flex-1">
+        <div className="relative xl:flex-1">
+          <Select value={lang} onValueChange={setLang}>
+            <SelectTrigger className="capitalize max-w-[160px] absolute z-10 bg-background px-3 right-1 top-1 opacity-70 hover:opacity-100 focus:opacity-100 focus-within:opacity-100 active:opacity-100 transition-opacity py-2 rounded flex items-center gap-10">
+              <SelectValue placeholder="Language" />
+            </SelectTrigger>
+            <SelectContent>
+              {supported_languages.map((language) => (
+                <SelectItem
+                  className="capitalize"
+                  key={language}
+                  value={language}
+                >
+                  {language}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <CodeEditor
             language={lang}
             onChange={(val) => {
@@ -94,23 +104,33 @@ const SingleCode = () => {
             <ArrowRight />
           </Button>
         </div>
-        <div className="xl:flex-1">
+        <div className="xl:flex-1 relative">
+          <Progress
+            className={cn("absolute z-10 transition-opacity", {
+              "opacity-0": !isPending,
+              "opacity-100": isPending,
+            })}
+            value={progress}
+          />
           {outputs.length > 0 ? (
-            <Tabs defaultValue={outputs[0].type + 0}>
-              <TabsList>
+            <Tabs className="relative" defaultValue={outputs[0].type + 0}>
+              <TabsList className="absolute z-10 bottom-full mb-3">
                 {outputs.map((op, i) => (
                   <TabsTrigger
                     value={op.type + i}
                     key={"trigger" + op.type + i}
                     className="capitalize"
                   >
-                    {op.type}
+                    {op.type} #{i + 1}
                   </TabsTrigger>
                 ))}
               </TabsList>
               {outputs.map((op, i) => (
-                <TabsContent key={"output" + op.type + i} value={op.type + i}>
-                  {/* {op.content} */}
+                <TabsContent
+                  className="relative"
+                  key={"output" + op.type + i}
+                  value={op.type + i}
+                >
                   <SingleCodeOutput
                     lang={lang}
                     output={op.content}
