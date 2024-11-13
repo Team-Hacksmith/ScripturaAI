@@ -22,7 +22,7 @@ def gen_docstring(content) -> str:
 
     model = ChatGoogleGenerativeAI(
         model="gemini-pro",
-        temperature=0.4,
+        temperature=0.7,
         api_key=key,
     )
     output_parser = StrOutputParser()
@@ -46,7 +46,7 @@ def gen_algorithm(content) -> str:
 
     model = ChatGoogleGenerativeAI(
         model="gemini-pro",
-        temperature=0.4,
+        temperature=0.7,
         api_key=key,
     )
     output_parser = StrOutputParser()
@@ -118,7 +118,7 @@ def gen_guide(content) -> str:
 
     model = ChatGoogleGenerativeAI(
         model="gemini-pro",
-        temperature=0.4,
+        temperature=0.7,
         api_key=key,
     )
     output_parser = StrOutputParser()
@@ -127,3 +127,24 @@ def gen_guide(content) -> str:
     write_files([{"filename": "userGuide.md", "content": response}], False)
     return response
 
+def gen_markdown(content) -> str:
+    from fileIO import write_files
+    import os
+
+    prompt = ChatPromptTemplate.from_template(
+        "Please analyse this code: {content} and generate corresponding markdown for this code, summarizing everything in this code"
+    )
+    key = SecretStr(os.getenv("GEMINI_API_KEY", ""))
+    if not key:
+        raise Exception("Gemini API key not set")
+
+    model = ChatGoogleGenerativeAI(
+        model="gemini-pro",
+        temperature=0.7,
+        api_key=key,
+    )
+    output_parser = StrOutputParser()
+    chain = prompt | model | output_parser
+    response = chain.invoke({"content": content})
+    # write_files([{"filename": f"{os.path.splitext(filename)[0]}.md", "content": response}], False)
+    return response
