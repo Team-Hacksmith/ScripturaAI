@@ -557,13 +557,13 @@ protobuf = ">=3.20.2,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4
 
 [[package]]
 name = "google-api-core"
-version = "2.22.0"
+version = "2.23.0"
 description = "Google API client core library"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "google_api_core-2.22.0-py3-none-any.whl", hash = "sha256:a6652b6bd51303902494998626653671703c420f6f4c88cfd3f50ed723e9d021"},
-    {file = "google_api_core-2.22.0.tar.gz", hash = "sha256:26f8d76b96477db42b55fd02a33aae4a42ec8b86b98b94969b7333a2c828bf35"},
+    {file = "google_api_core-2.23.0-py3-none-any.whl", hash = "sha256:c20100d4c4c41070cf365f1d8ddf5365915291b5eb11b83829fbd1c999b5122f"},
+    {file = "google_api_core-2.23.0.tar.gz", hash = "sha256:2ceb087315e6af43f256704b871d99326b1f12a9d6ce99beaedec99ba26a0ace"},
 ]
 
 [package.dependencies]
@@ -586,13 +586,13 @@ grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.dev0)"]
 
 [[package]]
 name = "google-api-python-client"
-version = "2.151.0"
+version = "2.152.0"
 description = "Google API Client Library for Python"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "google_api_python_client-2.151.0-py2.py3-none-any.whl", hash = "sha256:4427b2f47cd88b0355d540c2c52215f68c337f3bc9d6aae1ceeae4525977504c"},
-    {file = "google_api_python_client-2.151.0.tar.gz", hash = "sha256:a9d26d630810ed4631aea21d1de3e42072f98240aaf184a8a1a874a371115034"},
+    {file = "google_api_python_client-2.152.0-py2.py3-none-any.whl", hash = "sha256:3e429b4584f6ccb620c1c4cdd43a6d78c5a8d307fc64860026aa26e203e8f932"},
+    {file = "google_api_python_client-2.152.0.tar.gz", hash = "sha256:9593476dc548fcba794f2ea0e3cfbf927de5a7b79379781c1664637bf246f072"},
 ]
 
 [package.dependencies]
@@ -665,13 +665,13 @@ dev = ["Pillow", "absl-py", "black", "ipython", "nose2", "pandas", "pytype", "py
 
 [[package]]
 name = "googleapis-common-protos"
-version = "1.65.0"
+version = "1.66.0"
 description = "Common protobufs used in Google APIs"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "googleapis_common_protos-1.65.0-py2.py3-none-any.whl", hash = "sha256:2972e6c496f435b92590fd54045060867f3fe9be2c82ab148fc8885035479a63"},
-    {file = "googleapis_common_protos-1.65.0.tar.gz", hash = "sha256:334a29d07cddc3aa01dee4988f9afd9b2916ee2ff49d6b757155dc0d197852c0"},
+    {file = "googleapis_common_protos-1.66.0-py2.py3-none-any.whl", hash = "sha256:d7abcd75fabb2e0ec9f74466401f6c119a0b498e27370e9be4c94cb7e382b8ed"},
+    {file = "googleapis_common_protos-1.66.0.tar.gz", hash = "sha256:c3e7b33d15fdca5374cc0a7346dd92ffa847425cc4ea941d970f13680052ec8c"},
 ]
 
 [package.dependencies]
@@ -1105,21 +1105,21 @@ tenacity = ">=8.1.0,<8.4.0 || >8.4.0,<10"
 
 [[package]]
 name = "langchain-community"
-version = "0.3.5"
+version = "0.3.7"
 description = "Community contributed LangChain integrations."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "langchain_community-0.3.5-py3-none-any.whl", hash = "sha256:03736105700960fa0acbd72bff678d1c97c49e38e9f8af3012b712d64e992982"},
-    {file = "langchain_community-0.3.5.tar.gz", hash = "sha256:345febbc972a08c97f09cce6cc07d039aa7d1348fe8efdace85335be6ac9cb7d"},
+    {file = "langchain_community-0.3.7-py3-none-any.whl", hash = "sha256:048f89d9a54b0720a0f865d5d469494e088cb9970a2397b19446ce0d84867141"},
+    {file = "langchain_community-0.3.7.tar.gz", hash = "sha256:5b7a5cea82bedbf3ea276eac56128e00dbaf86561991cfc80fb21175a343c9a3"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.8.3,<4.0.0"
 dataclasses-json = ">=0.5.7,<0.7"
 httpx-sse = ">=0.4.0,<0.5.0"
-langchain = ">=0.3.6,<0.4.0"
-langchain-core = ">=0.3.15,<0.4.0"
+langchain = ">=0.3.7,<0.4.0"
+langchain-core = ">=0.3.17,<0.4.0"
 langsmith = ">=0.1.125,<0.2.0"
 numpy = {version = ">=1.26.0,<2.0.0", markers = "python_version >= \"3.12\""}
 pydantic-settings = ">=2.4.0,<3.0.0"
@@ -1202,13 +1202,13 @@ langchain-core = ">=0.3.15,<0.4.0"
 
 [[package]]
 name = "langgraph"
-version = "0.2.45"
+version = "0.2.46"
 description = "Building stateful, multi-actor applications with LLMs"
 optional = false
 python-versions = "<4.0,>=3.9.0"
 files = [
-    {file = "langgraph-0.2.45-py3-none-any.whl", hash = "sha256:adfa9545c6c27180e995b654cb5817212c134a98407c7f34253a5fae58893f28"},
-    {file = "langgraph-0.2.45.tar.gz", hash = "sha256:939035e830506c5b662c9e61d95dbd1a5ef9d1fd35310dba68cebb33de2e7cdb"},
+    {file = "langgraph-0.2.46-py3-none-any.whl", hash = "sha256:7ca4031bc8f06cb3697ccee21ca80464588656391d3888090b6790dd89bffad1"},
+    {file = "langgraph-0.2.46.tar.gz", hash = "sha256:f1a39ba0d9b3df3b807b14015e682bc2b445ceb760d113e75ab34209a7eaadef"},
 ]
 
 [package.dependencies]
@@ -1218,13 +1218,13 @@ langgraph-sdk = ">=0.1.32,<0.2.0"
 
 [[package]]
 name = "langgraph-checkpoint"
-version = "2.0.2"
+version = "2.0.3"
 description = "Library with base interfaces for LangGraph checkpoint savers."
 optional = false
 python-versions = "<4.0.0,>=3.9.0"
 files = [
-    {file = "langgraph_checkpoint-2.0.2-py3-none-any.whl", hash = "sha256:6e5dfd90e1fc71b91ccff75939ada1114e5d7f824df5f24c62d39bed69039ee2"},
-    {file = "langgraph_checkpoint-2.0.2.tar.gz", hash = "sha256:c1d033e4e4855f580fa56830327eb86513b64ab5be527245363498e76b19a0b9"},
+    {file = "langgraph_checkpoint-2.0.3-py3-none-any.whl", hash = "sha256:70da073793e0750f4b9dfe5fbbe49b267c494987aaa8f2d04be23bfd0d8a6fd7"},
+    {file = "langgraph_checkpoint-2.0.3.tar.gz", hash = "sha256:d7aabbc78eeb5466301be2ede5e0b0b8e5dc97647fcbe79801f1326f85fc0344"},
 ]
 
 [package.dependencies]
