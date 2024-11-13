@@ -15,11 +15,10 @@ const AddDoc: React.FC = () => {
   const handleUpload = () => {
     if (file) {
       setLoading(true);
-      // Simulate file upload with a timeout (replace with actual upload logic)
       setTimeout(() => {
         console.log("File uploaded:", file);
-        setLoading(false); // Stop the spinner after upload
-      }, 3000); // Simulate 3 seconds of upload time
+        setLoading(false); 
+      }, 3000); 
     } else {
       alert("Please select a file before uploading.");
     }
@@ -55,7 +54,7 @@ const AddDoc: React.FC = () => {
       <button
         onClick={handleUpload}
         className="w-full bg-blue-500 text-white py-2 rounded-md font-bold hover:bg-blue-600 transition-colors flex items-center justify-center"
-        disabled={loading} // Disable the button while loading
+        disabled={loading} 
       >
         {loading ? (
           <div className="flex items-center space-x-2">
