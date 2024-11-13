@@ -18,18 +18,14 @@ def zip_repo(repo_name):
     if not os.path.isdir(repo_path):
         raise FileNotFoundError(f"Repository {repo_name} does not exist.")
 
-    # Create the zip file on disk
     zip_file_path = shutil.make_archive(repo_path, "zip", repo_path)
 
-    # Read the zip file into memory
     zip_buffer = io.BytesIO()
     with open(zip_file_path, "rb") as f:
         zip_buffer.write(f.read())
 
-    # Delete the zip file from disk after reading
     os.remove(zip_file_path)
 
-    # Reset buffer position to the beginning
     zip_buffer.seek(0)
     return zip_buffer
 
@@ -63,19 +59,27 @@ def clone_repo(repo_url):
     try:
         print(f"Cloning repository: git clone {repo_url} {clone_path}")
         subprocess.check_call(["git", "clone", repo_url, clone_path])
+
         git_dir = os.path.join(clone_path, ".git")
         if os.path.isdir(git_dir):
-            shutil.rmtree(git_dir)  # Remove the .git folder
+            print(f"Deleting .git folder in {clone_path}")
+            shutil.rmtree(
+                git_dir, ignore_errors=True
+            ) 
             print(f"Deleted .git folder in {clone_path}")
+        else:
+            print("Warning: .git folder not found, skipping deletion.")
+
     except subprocess.CalledProcessError as e:
-        print(f"Error: {str(e)}")
+        print(f"Error during clone: {str(e)}")
         return jsonify({"error": f"Failed to clone the repository: {str(e)}"}), 500
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        return jsonify({"error": f"Failed to delete .git folder: {str(e)}"}), 500
 
     generate_docstring_for_whole_repo(os.path.join(CLONE_DIR, repo_name))
-    # Zip the repository into an in-memory buffer
     zip_buffer = zip_repo(repo_name)
 
-    # Send the zip file as a downloadable response
     return send_file(
         zip_buffer,
         as_attachment=True,
@@ -85,21 +89,17 @@ def clone_repo(repo_url):
 
 
 def generate_mkdocs_yml(site_name, docs_dir="docs"):
-    # Set up the base structure for mkdocs.yml
     mkdocs_config = {"site_name": site_name, "docs_dir": docs_dir, "nav": []}
 
-    # Traverse the docs directory to populate navigation
     for root, _, files in os.walk(docs_dir):
         rel_path = os.path.relpath(root, docs_dir)
 
         if rel_path == ".":
-            # Root level files
             for file in files:
                 if file.endswith(".md"):
                     page_name = os.path.splitext(file)[0].capitalize()
                     mkdocs_config["nav"].append({page_name: file})
         else:
-            # Subdirectories and nested files
             section = {"name": os.path.basename(root).capitalize(), "items": []}
             for file in files:
                 if file.endswith(".md"):
@@ -111,7 +111,6 @@ def generate_mkdocs_yml(site_name, docs_dir="docs"):
                     {os.path.basename(root).capitalize(): section["items"]}
                 )
 
-    # Save the mkdocs.yml file
     with open("mkdocs.yml", "w") as f:
         yaml.dump(mkdocs_config, f, sort_keys=False)
     print("mkdocs.yml generated with auto-indexed files.")

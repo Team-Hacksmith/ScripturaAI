@@ -140,5 +140,4 @@ def gen_markdown(content) -> str:
     output_parser = StrOutputParser()
     chain = prompt | model | output_parser
     response = chain.invoke({"content": content})
-    # write_files([{"filename": f"{os.path.splitext(filename)[0]}.md", "content": response}], False)
     return response
