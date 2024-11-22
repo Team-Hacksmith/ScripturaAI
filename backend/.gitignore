@@ -1,0 +1,6 @@
+mkdocs_output
+cloned_repos
+.venv
+.env
+uploads
+__pycache__

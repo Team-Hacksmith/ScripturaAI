@@ -43,7 +43,7 @@ export const getGenerationFromGithub = async (
 ): Promise<Blob> => {
   const response = await fetch(`${BASE_URL}/cloneRepo`, {
     method: "POST",
-    body: JSON.stringify({ url, type }),
+    body: JSON.stringify({ url }),
     headers: {
       "Content-Type": "application/json",
     },

@@ -9,15 +9,13 @@ import {
 import { getSingleGenerationAction } from "@/lib/actions";
 import { supported_languages, supported_types } from "@/lib/config";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "../ui/button";
 import CodeEditor from "../ui/CodeEditor";
+import FakeProgress from "../ui/fake-progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import SingleCodeOutput from "./SingleCodeOutput";
 import { OutputType, SingleCodeOutput as SingleCodeOutputT } from "./types";
-import { Progress } from "../ui/progress";
-import { cn } from "@/lib/utils";
-import FakeProgress from "../ui/fake-progress";
 
 const SingleCode = () => {
   const [value, setValue] = useState("");
@@ -91,7 +89,7 @@ const SingleCode = () => {
           </Button>
         </div>
         <div className="xl:flex-1 relative">
-          <FakeProgress isPending={isPending} />
+          <FakeProgress isPending={isPending} timeInterval={1000} />
           {outputs.length > 0 ? (
             <Tabs className="relative" defaultValue={outputs[0].type + 0}>
               <TabsList className="absolute z-10 bottom-full mb-3">

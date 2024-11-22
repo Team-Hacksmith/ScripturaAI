@@ -15,7 +15,7 @@ const Page: React.FC = () => {
           <TabsList className="mb-3">
             <TabsTrigger value="code">Code</TabsTrigger>
             <TabsTrigger value="upload">Upload</TabsTrigger>
-            {/* <TabsTrigger value="github">Github</TabsTrigger> */}
+            <TabsTrigger value="github">Github</TabsTrigger>
             <TabsTrigger
               className="border border-orange-500 data-[state=active]:bg-gradient-to-tr from-orange-500 to-red-600"
               value="github-website"

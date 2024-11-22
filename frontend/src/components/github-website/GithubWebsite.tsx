@@ -92,7 +92,11 @@ const GithubWebsite = () => {
           </Button>
         )}
       </div>
-      <FakeProgress className="bottom-full w-full" isPending={isPending} />
+      <FakeProgress
+        timeInterval={2000}
+        className="bottom-full w-full"
+        isPending={isPending}
+      />
     </div>
   );
 };

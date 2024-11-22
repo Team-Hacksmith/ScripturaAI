@@ -116,6 +116,7 @@ def genMarkdown():
 @app.route("/cloneRepo", methods=["POST"])
 def cloneRepo():
     repo_url = request.json.get("url")
+    print(repo_url)
 
     if not repo_url:
         return jsonify({"error": "Missing url parameter"}), 400
@@ -132,7 +133,9 @@ mkdocs_processes = {}  # Dictionary to store active processes by site name
 
 def run_mkdocs_serve(site_name, port):
     process = subprocess.Popen(
-        f"mkdocs serve --dev-addr=0.0.0.0:{port}", shell=True, cwd=site_name
+        f"mkdocs serve --dev-addr=0.0.0.0:{port}",
+        shell=True,
+        cwd=os.path.join("mkdocs_output", site_name),
     )
     mkdocs_processes[site_name] = process
 
@@ -159,17 +162,17 @@ def generateWebsite():
 
     repo_name = os.path.splitext(os.path.basename(repo_url))[0]
 
-    if not os.path.exists(site_name):
-        os.makedirs(site_name)
+    if not os.path.exists(os.path.join("mkdocs_output", site_name)):
+        os.makedirs(os.path.join("mkdocs_output", site_name))
 
-    mkdocs_yml_path = os.path.join(site_name, "mkdocs.yml")
+    mkdocs_yml_path = os.path.join("mkdocs_output", site_name, "mkdocs.yml")
     with open(mkdocs_yml_path, "w") as yml_file:
         yml_file.write(f"site_name: {site_name}\n")
         yml_file.write(f"docs_dir: docs\n")
         yml_file.write("theme:\n")
         yml_file.write("  name: material\n")
 
-    mkdocs_dir = os.path.join(site_name, "docs")
+    mkdocs_dir = os.path.join("mkdocs_output", site_name, "docs")
     os.makedirs(mkdocs_dir, exist_ok=True)
 
     cloned_repo_path = os.path.join("cloned_repos", repo_name)

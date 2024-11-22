@@ -130,7 +130,7 @@ def gen_markdown(content) -> str:
     )
     key = SecretStr(os.getenv("OPENAI_API_KEY", ""))
     if not key:
-        raise Exception("Gemini API key not set")
+        raise Exception("API key not set")
 
     model = ChatOpenAI(
         model="gpt-4o-mini",

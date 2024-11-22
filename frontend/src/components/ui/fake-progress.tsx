@@ -5,9 +5,15 @@ import { Progress } from "./progress";
 
 type Props = {
   isPending: boolean;
+  timeInterval?: number;
 } & React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>;
 
-const FakeProgress = ({ isPending, className, ...props }: Props) => {
+const FakeProgress = ({
+  isPending,
+  className,
+  timeInterval = 500,
+  ...props
+}: Props) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -16,12 +22,12 @@ const FakeProgress = ({ isPending, className, ...props }: Props) => {
     if (isPending) {
       interval = setInterval(() => {
         setProgress((prev) => Math.min(prev + 5, 95));
-      }, 500);
+      }, timeInterval);
     } else {
       setProgress(0);
     }
     return () => clearInterval(interval);
-  }, [isPending]);
+  }, [isPending, timeInterval]);
 
   return (
     <Progress

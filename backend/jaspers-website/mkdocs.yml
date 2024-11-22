@@ -1,4 +1,0 @@
-site_name: jaspers-website
-docs_dir: docs
-theme:
-  name: material
