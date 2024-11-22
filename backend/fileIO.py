@@ -208,7 +208,7 @@ def generate_docstring_for_whole_repo(repo_folder_path):
     return file_records
 
 
-def onerror(func, path, exc_info):
+def handle_remove_error(func, path, exc_info):
     """
     Error handler for ``shutil.rmtree``.
 
