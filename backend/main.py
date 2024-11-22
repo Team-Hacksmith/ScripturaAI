@@ -1,7 +1,12 @@
 import os
 import threading
 
-from fileIO import read_files, strip_backticks, write_files_to_memory
+from fileIO import (
+    handle_remove_error,
+    read_files,
+    strip_backticks,
+    write_files_to_memory,
+)
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from ai import gen_docstring, gen_algorithm, gen_mermaid, gen_guide, gen_markdown
 from github_routes import clone_repo
@@ -188,7 +193,7 @@ def generate_website():
         # Delete the .git folder
         git_dir = os.path.join(cloned_repo_path, ".git")
         if os.path.exists(git_dir):
-            shutil.rmtree(git_dir)
+            shutil.rmtree(git_dir, onexc=handle_remove_error)
             print(f"Deleted .git folder in {cloned_repo_path}")
 
     blacklisted_extensions = {
