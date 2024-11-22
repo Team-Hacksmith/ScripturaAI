@@ -2,14 +2,14 @@ import os
 import threading
 
 from fileIO import read_files, strip_backticks, write_files_to_memory
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 from ai import gen_docstring, gen_algorithm, gen_mermaid, gen_guide, gen_markdown
 from github_routes import clone_repo
 import subprocess
 from flask_cors import CORS
 import shutil
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="mkdocs_output")
 cors = CORS(app)  # allow CORS for all domains on all routes.
 app.config["CORS_HEADERS"] = "Content-Type"
 
@@ -150,45 +150,46 @@ def cleanup_site(site_name):
 
 
 @app.route("/generateWebsite", methods=["POST"])
-def generateWebsite():
+def generate_website():
     data = request.get_json()
 
     if not data or "site_name" not in data or "repo_url" not in data:
         return jsonify({"error": "Missing 'site_name' or 'repo_url' in request"}), 400
 
-    site_name = data["site_name"]
+    site_name = data["site_name"].strip().replace(" ", "_")
     repo_url = data["repo_url"]
-    port = data["port"]
 
-    repo_name = os.path.splitext(os.path.basename(repo_url))[0]
+    # Define paths
+    mkdocs_config_dir = os.path.join("mkdocs_output", site_name)
+    cloned_repo_path = os.path.join("cloned_repos", site_name)
 
-    if not os.path.exists(os.path.join("mkdocs_output", site_name)):
-        os.makedirs(os.path.join("mkdocs_output", site_name))
+    # Prepare directories
+    if not os.path.exists(mkdocs_config_dir):
+        os.makedirs(mkdocs_config_dir)
 
-    mkdocs_yml_path = os.path.join("mkdocs_output", site_name, "mkdocs.yml")
+    # Create the mkdocs.yml file with the correct site_dir
+    mkdocs_yml_path = os.path.join(mkdocs_config_dir, "mkdocs.yml")
     with open(mkdocs_yml_path, "w") as yml_file:
         yml_file.write(f"site_name: {site_name}\n")
         yml_file.write(f"docs_dir: docs\n")
+        yml_file.write(f"site_dir: site\n")
         yml_file.write("theme:\n")
         yml_file.write("  name: material\n")
 
-    mkdocs_dir = os.path.join("mkdocs_output", site_name, "docs")
-    os.makedirs(mkdocs_dir, exist_ok=True)
+    docs_dir = os.path.join(mkdocs_config_dir, "docs")
+    os.makedirs(docs_dir, exist_ok=True)
 
-    cloned_repo_path = os.path.join("cloned_repos", repo_name)
-
-    git_dir = os.path.join(cloned_repo_path, ".git")
+    # Clone repository
     if not os.path.exists(cloned_repo_path):
         os.makedirs("cloned_repos", exist_ok=True)
-        clone_cmd = f"git clone {repo_url} {cloned_repo_path}"
-        subprocess.run(clone_cmd, shell=True, check=True)
-
-    if os.path.isdir(git_dir):
-        print(f"Deleting .git folder in {cloned_repo_path}")
-        shutil.rmtree(git_dir)
-        print(f"Deleted .git folder in {cloned_repo_path}")
-    else:
-        print(f".git folder not found in {cloned_repo_path}, skipping deletion.")
+        subprocess.run(
+            f"git clone {repo_url} {cloned_repo_path}", shell=True, check=True
+        )
+        # Delete the .git folder
+        git_dir = os.path.join(cloned_repo_path, ".git")
+        if os.path.exists(git_dir):
+            shutil.rmtree(git_dir)
+            print(f"Deleted .git folder in {cloned_repo_path}")
 
     blacklisted_extensions = {
         ".exe",
@@ -202,10 +203,25 @@ def generateWebsite():
         ".rev",
     }
 
-    for dirpath, _, filenames in os.walk(cloned_repo_path):
+    home_page_content = f"""
+    # {site_name}
+
+    Welcome to {site_name}
+    """
+
+    with open(os.path.join(docs_dir, "index.md"), "w", encoding="utf-8") as home_file:
+        home_file.write(home_page_content)
+
+    for dirpath, dirnames, filenames in os.walk(cloned_repo_path):
         for filename in filenames:
             file_path = os.path.join(dirpath, filename)
             file_ext = os.path.splitext(filename)[1]
+
+            if file_ext == ".md":
+                shutil.copy(
+                    os.path.join(dirpath, filename), os.path.join(docs_dir, filename)
+                )
+                continue
 
             if file_ext in blacklisted_extensions:
                 continue
@@ -213,30 +229,58 @@ def generateWebsite():
             try:
                 with open(file_path, "r", encoding="utf-8") as file:
                     content = file.read()
-
+                print(f"Processing: {filename}")
                 processed_content = gen_markdown(content)
+                print(f"Processed: {filename}")
                 if processed_content:
                     markdown_filename = os.path.join(
-                        mkdocs_dir, f"{os.path.splitext(filename)[0]}.md"
+                        docs_dir, f"{os.path.splitext(filename)[0]}.md"
                     )
                     with open(markdown_filename, "w", encoding="utf-8") as md_file:
                         md_file.write(processed_content)
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
 
-    # Start mkdocs serve in a new thread
-    thread = threading.Thread(target=run_mkdocs_serve, args=(site_name, port))
-    thread.start()
+    print("Processed all files. Now building mkdocs...")
+
+    # Build the MkDocs site
+    subprocess.run(f"mkdocs build -f {mkdocs_yml_path}", shell=True, check=True)
+
+    site_output_dir = f"mkdocs_output/{site_name}/site"
 
     return (
         jsonify(
             {
-                "url": f"http://localhost:{port}",
-                "success": f"Website created with markdown files in {mkdocs_dir}",
+                "success": f"Website built successfully at {site_output_dir}",
+                "url": f"http://localhost:5000/static/{site_name}/site/index.html",
             }
         ),
         200,
     )
+
+
+@app.route("/static/<site_name>/site/", defaults={"path": ""})
+@app.route("/static/<site_name>/site/<path:path>")
+def serve_site(site_name, path):
+    """Serve the built MkDocs site files."""
+    site_root = os.path.join("mkdocs_output", site_name, "site")
+
+    # If no specific file is provided, serve index.html
+    if path == "":
+        path = "index.html"
+    else:
+        # If the path is a directory, serve index.html from that directory
+        potential_index = os.path.join(site_root, path, "index.html")
+        if os.path.isdir(os.path.join(site_root, path)) and os.path.exists(
+            potential_index
+        ):
+            path = os.path.join(path, "index.html")
+
+    # Serve the file
+    try:
+        return send_from_directory(site_root, path)
+    except FileNotFoundError:
+        return "File not found", 404
 
 
 @app.route("/stopServer", methods=["POST"])
