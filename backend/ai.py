@@ -57,7 +57,9 @@ def gen_algorithm(content) -> str:
 
 def gen_mermaid(text) -> str:
 
+    print("Generating algo...")
     content = gen_algorithm(text)
+    print("Generated algo.")
     from fileIO import write_files, strip_backticks
 
     prompt = ChatPromptTemplate.from_template(
@@ -90,7 +92,9 @@ def gen_mermaid(text) -> str:
     output_parser = StrOutputParser()
 
     chain = prompt | model | output_parser
+    print("Generating diagram...")
     response = chain.invoke({"content": content})
+    print("Generated diagram.")
     response = strip_backticks(response)
     return response
 

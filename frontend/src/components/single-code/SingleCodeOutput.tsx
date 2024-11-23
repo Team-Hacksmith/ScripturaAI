@@ -20,7 +20,11 @@ const SingleCodeOutput = ({ lang, output, type }: Props) => {
     case "code":
       return <CodeEditor language={lang} onChange={() => {}} value={output} />;
     case "diagram":
-      return <Mermaid chart={output} />;
+      return (
+        <div className="bg-foreground px-10 rounded-md">
+          <Mermaid chart={output} />
+        </div>
+      );
     default:
       throw new Error("Invalid output type");
   }
