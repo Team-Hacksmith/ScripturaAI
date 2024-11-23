@@ -28,7 +28,7 @@ const GithubWebsite = () => {
             onChange={(e) => setTitle(e.target.value)}
           />
         </fieldset>
-        <fieldset>
+        {/* <fieldset>
           <Label>Enter a port:</Label>
           <Input
             disabled={!!liveUrl}
@@ -38,7 +38,7 @@ const GithubWebsite = () => {
             value={port}
             onChange={(e) => setPort(e.target.value)}
           />
-        </fieldset>
+        </fieldset> */}
         <fieldset>
           <Label>
             Enter a public github URL to clone and generate docs for:
